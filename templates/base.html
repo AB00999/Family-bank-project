@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f8f3">
+    <title>{% block title %}Family Bank{% endblock %}</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #19332b;
+            --muted: #60716a;
+            --green: #1f6a4c;
+            --cream: #f7f8f3;
+            --line: #e4e9df;
+        }
+        * { box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            background: var(--cream);
+            color: var(--ink);
+            font: 16px/1.6 "Segoe UI", Arial, sans-serif;
+        }
+        a { color: var(--green); }
+        a:focus-visible, button:focus-visible, input:focus-visible {
+            outline: 3px solid #84a93d;
+            outline-offset: 3px;
+        }
+        header, main, footer { width: min(100% - 36px, 960px); margin-inline: auto; }
+        header { padding: 20px 0; border-bottom: 1px solid var(--line); }
+        .brand { color: var(--ink); font-size: 1.2rem; font-weight: 750; text-decoration: none; }
+        .concept { margin-left: 8px; color: var(--muted); font-size: .75rem; font-weight: 700; }
+        main { display: grid; place-items: center; padding-block: 48px; }
+        .panel {
+            width: min(100%, 480px);
+            padding: clamp(24px, 6vw, 42px);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            background: white;
+            box-shadow: 0 18px 55px rgba(25, 51, 43, .08);
+        }
+        h1 { margin: 0 0 8px; font-size: clamp(1.8rem, 5vw, 2.3rem); letter-spacing: -.04em; line-height: 1.15; }
+        .intro { margin: 0 0 24px; color: var(--muted); }
+        .field { display: grid; gap: 6px; margin: 18px 0; }
+        label { font-size: .9rem; font-weight: 700; }
+        input {
+            width: 100%;
+            min-height: 48px;
+            padding: 10px 13px;
+            border: 1px solid #cbd5ca;
+            border-radius: 10px;
+            color: var(--ink);
+            font: inherit;
+        }
+        button {
+            width: 100%;
+            min-height: 48px;
+            margin-top: 8px;
+            border: 0;
+            border-radius: 999px;
+            background: var(--green);
+            color: white;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        button:hover { background: #194f39; }
+        .switch { margin: 20px 0 0; text-align: center; }
+        .notice, .message { padding: 12px 14px; border-radius: 10px; font-size: .9rem; }
+        .notice { margin-top: 20px; background: #f4f6ed; color: #4f5c41; }
+        .messages { width: min(100%, 480px); margin-bottom: 16px; }
+        .message { margin: 0 0 8px; background: #eef4e7; }
+        .message.error { background: #fff0ed; color: #782b1d; }
+        .message.info { background: #eef4e7; color: #38533f; }
+        footer { padding: 18px 0 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: .82rem; }
+        footer p { margin: 0; }
+        .dashboard-actions { margin-top: 24px; }
+        @media (max-width: 520px) {
+            header, main, footer { width: min(100% - 24px, 960px); }
+            main { padding-block: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a class="brand" href="{{ url_for('login') }}">Family Bank</a>
+        <span class="concept">Concept demo</span>
+    </header>
+    <main>
+        <div style="width:100%; display:grid; justify-items:center;">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="messages" role="status" aria-live="polite">
+                        {% for category, message in messages %}
+                            <p class="message {{ category }}">{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    <footer>
+        <p>Fictional learning project only. Not a real bank. Never use a real bank password here.</p>
+    </footer>
+</body>
+</html>

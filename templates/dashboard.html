@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}Your account | Family Bank Concept{% endblock %}
+{% block content %}
+<style>
+    .dashboard-page {
+        width: min(100%, 960px);
+        color: #20344a;
+    }
+    .dashboard-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+    }
+    .dashboard-header h1 { margin-bottom: 6px; }
+    .dashboard-header .intro { margin-bottom: 0; }
+    .dashboard-badge {
+        flex: 0 0 auto;
+        padding: 7px 10px;
+        border: 1px solid #d9e1e8;
+        border-radius: 4px;
+        background: #f3f6f8;
+        color: #40566b;
+        font-size: .75rem;
+        font-weight: 750;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
+    .account-navigation {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        margin-bottom: 20px;
+        padding: 0 16px;
+        border: 1px solid #dce3e9;
+        border-radius: 5px;
+        background: white;
+    }
+    .account-navigation a {
+        padding: 13px 0;
+        color: #344b60;
+        font-size: .9rem;
+        font-weight: 650;
+        text-decoration: none;
+    }
+    .account-navigation a:hover { color: #12604c; text-decoration: underline; }
+    .account-navigation .nav-spacer { flex: 1; }
+    .account-navigation form { margin: 0; }
+    .account-navigation button {
+        width: auto;
+        min-height: 38px;
+        margin: 0;
+        padding: 6px 14px;
+        border: 1px solid #cbd5dc;
+        border-radius: 4px;
+        background: white;
+        color: #344b60;
+        font-size: .86rem;
+    }
+    .account-navigation button:hover { background: #f3f6f8; }
+    .balance-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: clamp(22px, 5vw, 32px);
+        border: 1px solid #173f50;
+        border-radius: 6px;
+        background: #173f50;
+        color: white;
+    }
+    .balance-label { margin: 0 0 7px; color: #d6e2e7; font-size: .88rem; }
+    .balance-value { margin: 0; font-size: clamp(2rem, 7vw, 2.8rem); font-weight: 700; letter-spacing: -.03em; line-height: 1.15; }
+    .balance-note { margin: 10px 0 0; color: #d6e2e7; font-size: .8rem; }
+    .account-reference {
+        padding-left: 20px;
+        border-left: 1px solid rgba(255, 255, 255, .3);
+        color: #e4edf0;
+        font-size: .85rem;
+        text-align: right;
+    }
+    .account-reference strong { display: block; margin-top: 4px; color: white; font-size: .95rem; }
+    .history-panel {
+        margin-top: 20px;
+        padding: clamp(18px, 4vw, 26px);
+        border: 1px solid #dce3e9;
+        border-radius: 6px;
+        background: white;
+    }
+    .history-heading {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    .history-heading h2 { margin: 0; font-size: 1.12rem; }
+    .history-heading a { font-size: .88rem; font-weight: 650; }
+    .transaction-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .transaction-table th {
+        padding: 10px 12px;
+        border-top: 1px solid #dce3e9;
+        border-bottom: 1px solid #dce3e9;
+        background: #f5f7f9;
+        color: #53677a;
+        font-size: .75rem;
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
+    .transaction-table td { padding: 13px 12px; border-bottom: 1px solid #e8edf0; font-size: .9rem; }
+    .transaction-table tbody tr:last-child td { border-bottom: 0; }
+    .transaction-date { color: #53677a; white-space: nowrap; }
+    .transaction-description { font-weight: 650; overflow-wrap: anywhere; }
+    .transaction-amount { text-align: right; white-space: nowrap; font-weight: 700; }
+    .transaction-amount.credit { color: #176447; }
+    .transaction-amount.debit { color: #344b60; }
+    .empty-history { margin: 0; padding: 18px 0; color: #53677a; }
+    @media (max-width: 640px) {
+        .dashboard-header { align-items: flex-start; flex-direction: column; }
+        .account-navigation { flex-wrap: wrap; gap: 4px 18px; padding: 8px 12px; }
+        .account-navigation a { padding: 7px 0; }
+        .account-navigation .nav-spacer { display: none; }
+        .account-navigation form { margin-left: auto; }
+        .balance-card { align-items: flex-start; flex-direction: column; }
+        .account-reference { padding: 0; border: 0; text-align: left; }
+        .transaction-table th, .transaction-table td { padding: 10px 7px; }
+        .transaction-date { white-space: normal; }
+    }
+</style>
+<section class="dashboard-page" aria-labelledby="page-title">
+    <div class="dashboard-header">
+        <div>
+            <h1 id="page-title">Account overview</h1>
+            <p class="intro">Welcome back, {{ username }}.</p>
+        </div>
+        <span class="dashboard-badge">Fictional demo · No real funds</span>
+    </div>
+
+    <nav class="account-navigation" aria-label="Account navigation">
+        <a href="{{ url_for('dashboard') }}" aria-current="page">Overview</a>
+        <a href="{{ url_for('transaction_history') }}">Account activity</a>
+        {% if role in ("Admin", "Technician") %}
+            <a href="{{ url_for('technician_activity') }}">Technical activity</a>
+        {% endif %}
+        {% if role == "Admin" %}
+            <a href="{{ url_for('admin') }}">Administration</a>
+        {% endif %}
+        <span class="nav-spacer"></span>
+        <form method="post" action="{{ url_for('logout') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit">Sign out</button>
+        </form>
+    </nav>
+
+    <section class="balance-card" aria-labelledby="balance-heading">
+        <div>
+            <p class="balance-label" id="balance-heading">Available balance · Demo</p>
+            <p class="balance-value">{{ balance }}</p>
+            <p class="balance-note">Illustrative activity only. No money is held or transferred.</p>
+        </div>
+        <div class="account-reference">
+            Account type
+            <strong>Demo checking</strong>
+            Reference
+            <strong>DEMO-0001</strong>
+        </div>
+    </section>
+
+    <section class="history-panel" aria-labelledby="history-heading">
+        <div class="history-heading">
+            <h2 id="history-heading">Recent account activity</h2>
+            <a href="{{ url_for('transaction_history') }}">View all activity</a>
+        </div>
+        {% if transactions %}
+            <table class="transaction-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Description</th>
+                        <th scope="col" style="text-align:right;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                        <tr>
+                            <td>
+                                <time class="transaction-date" datetime="{{ transaction['occurred_at'] }}">
+                                    {{ transaction["occurred_at"] }}
+                                </time>
+                            </td>
+                            <td class="transaction-description">{{ transaction["description"] }}</td>
+                            <td class="transaction-amount {{ 'credit' if transaction['amount_cents'] > 0 else 'debit' }}">
+                                {{ format_demo_amount(transaction["amount_cents"]) }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="empty-history">No demo activity is recorded.</p>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

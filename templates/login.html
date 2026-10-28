@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Sign in | Family Bank Concept{% endblock %}
+{% block content %}
+<section class="panel" aria-labelledby="page-title">
+    <h1 id="page-title">Welcome back</h1>
+    <p class="intro">Sign in to your Family Bank demo account.</p>
+    <form method="post" action="{{ url_for('login') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="field">
+            <label for="username">Username</label>
+            <input id="username" name="username" type="text" autocomplete="username"
+                   minlength="3" maxlength="32" required>
+        </div>
+        <div class="field">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="current-password"
+                   maxlength="128" required>
+        </div>
+        <button type="submit">Sign in</button>
+    </form>
+    <p class="switch">New here? <a href="{{ url_for('register') }}">Create a demo account</a></p>
+    <p class="switch"><a href="{{ url_for('forgot_password') }}">Forgot your password?</a></p>
+    <p class="notice">This learning demo stores a password hash, never your original password. Do not use real or reused credentials.</p>
+</section>
+{% endblock %}

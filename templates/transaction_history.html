@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Demo transaction history | Family Bank Concept{% endblock %}
+{% block content %}
+<style>
+    .history-page { width: min(100%, 760px); }
+    .history-panel {
+        padding: clamp(18px, 4vw, 26px);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: white;
+    }
+    .transaction-list { margin: 20px 0; padding: 0; list-style: none; }
+    .transaction-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 4px 14px;
+        padding: 13px 0;
+        border-bottom: 1px solid var(--line);
+    }
+    .transaction-description { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+    .transaction-date { color: var(--muted); font-size: .82rem; }
+    .transaction-amount {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        align-self: center;
+        white-space: nowrap;
+        font-weight: 750;
+    }
+    .transaction-amount.credit { color: #1f6a4c; }
+    .transaction-amount.debit { color: #782b1d; }
+    .history-navigation {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin-top: 20px;
+    }
+    .empty-history { color: var(--muted); }
+</style>
+<section class="history-page" aria-labelledby="page-title">
+    <h1 id="page-title">Demo transaction history</h1>
+    <p class="intro">
+        {{ total_count }} demo transaction{{ "" if total_count == 1 else "s" }}.
+        These entries are fictional and do not represent real funds.
+    </p>
+    <div class="history-panel">
+        {% if transactions %}
+            <ul class="transaction-list">
+                {% for transaction in transactions %}
+                    <li class="transaction-row">
+                        <p class="transaction-description">{{ transaction["description"] }}</p>
+                        <time class="transaction-date" datetime="{{ transaction['occurred_at'] }}">
+                            {{ transaction["occurred_at"] }}
+                        </time>
+                        <span class="transaction-amount {{ 'credit' if transaction['amount_cents'] > 0 else 'debit' }}">
+                            {{ format_demo_amount(transaction["amount_cents"]) }}
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty-history">No demo activity is recorded.</p>
+        {% endif %}
+        <nav class="history-navigation" aria-label="Transaction history pages">
+            {% if page > 1 %}
+                <a href="{{ url_for('transaction_history', page=page - 1) }}">Newer transactions</a>
+            {% else %}
+                <span></span>
+            {% endif %}
+            <span>Page {{ page }} of {{ page_count if page_count else 1 }}</span>
+            {% if page < page_count %}
+                <a href="{{ url_for('transaction_history', page=page + 1) }}">Older transactions</a>
+            {% endif %}
+        </nav>
+    </div>
+    <p><a href="{{ url_for('dashboard') }}">Back to dashboard</a></p>
+</section>
+{% endblock %}
