@@ -70,6 +70,34 @@ class AtmTests(unittest.TestCase):
             self.balance_file.write_text(bad_contents)
             self.assertEqual(load_balance(self.balance_file), 1000)
 
+    def test_amounts_must_be_plain_ascii_digits(self):
+        for bad_amount in ("1_000", "\u0663", "+5", "1.5", "99999999999999999999"):
+            output = self.run_atm(["2", bad_amount, "1", "4"])
+            self.assertIn("Please enter a whole-dollar amount using numbers.", output)
+            self.assertIn("Current Balance: $1000", output)
+        self.assertFalse(self.balance_file.exists())
+
+    def test_deposit_cannot_push_balance_over_the_limit(self):
+        output = self.run_atm(["2", "999001", "2", "999000", "1", "4"])
+
+        self.assertIn("Deposit not allowed", output)
+        self.assertIn("New Balance: $1000000", output)
+        self.assertEqual(self.balance_file.read_text(), "1000000")
+
+        output = self.run_atm(["2", "1", "4"])
+        self.assertIn("Deposit not allowed", output)
+
+    def test_balance_file_over_the_limit_uses_starting_balance(self):
+        self.balance_file.write_text("1000001")
+        self.assertEqual(load_balance(self.balance_file), 1000)
+
+    def test_ctrl_c_and_ctrl_z_exit_politely_and_keep_saved_balance(self):
+        for interruption in (KeyboardInterrupt(), EOFError()):
+            output = self.run_atm(["2", "50", interruption])
+            self.assertIn("Thank you for using the Family Bank ATM demo.", output)
+            self.assertEqual(self.balance_file.read_text(), "1050")
+            self.balance_file.unlink()
+
     def test_save_and_load_balance_round_trip(self):
         save_balance(self.balance_file, 420)
         self.assertEqual(load_balance(self.balance_file), 420)

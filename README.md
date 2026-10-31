@@ -17,7 +17,8 @@ A fictional banking website concept and Python learning project.
 ### ATM Simulator
 - Menu loop for checking balance, depositing, withdrawing, or exiting
 - Starts with a simulated $1,000 balance, then saves changes to a local `atm_balance.txt` file so the balance carries over between runs (delete the file to reset it)
-- Deposits and withdrawals accept positive whole-dollar amounts
+- Deposits and withdrawals accept positive whole-dollar amounts written with plain digits; the demo balance is limited to $1,000,000
+- Ctrl+C or Ctrl+Z exits politely
 
 ### Login Checker
 - Standalone format-validation exercise; it does not authenticate users
