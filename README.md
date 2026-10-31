@@ -1,5 +1,7 @@
 # Family project
 
+![Family Bank preview](docs/images/social-preview.png)
+
 ## About
 
 A fictional banking website concept and Python learning project.
