@@ -529,7 +529,7 @@ def register():
                     seed_demo_transactions(connection, user_id)
                     record_audit_event(connection, "account_registered", user_id)
         except sqlite3.IntegrityError:
-            flash("That username or email is already registered.", "error")
+            flash("We couldn't create that account. Please try different details.", "error")
             return render_template("register.html")
 
         session.clear()
