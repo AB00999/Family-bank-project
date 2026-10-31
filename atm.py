@@ -1,8 +1,11 @@
+from datetime import datetime
 from pathlib import Path
 
 STARTING_BALANCE = 1000
 MAX_BALANCE = 1_000_000
+HISTORY_LINES_SHOWN = 10
 BALANCE_FILE = Path(__file__).with_name("atm_balance.txt")
+HISTORY_FILE = Path(__file__).with_name("atm_history.txt")
 
 
 def load_balance(balance_file):
@@ -32,7 +35,32 @@ def save_balance(balance_file, balance):
         print("Warning: your balance could not be saved.")
 
 
-def run_menu(balance_file):
+def record_transaction(history_file, kind, amount, balance):
+    # Add one line to the end of the history file, e.g.
+    # "2026-10-31 17:00 | Deposit | $250 | Balance: $1250"
+    when = datetime.now().strftime("%Y-%m-%d %H:%M")
+    line = f"{when} | {kind} | ${amount} | Balance: ${balance}\n"
+    try:
+        with open(history_file, "a") as file:
+            file.write(line)
+    except OSError:
+        print("Warning: this transaction could not be added to your history.")
+
+
+def show_history(history_file):
+    try:
+        lines = Path(history_file).read_text().splitlines()
+    except OSError:
+        lines = []
+    if not lines:
+        print("No transactions yet.")
+        return
+    print(f"Last {HISTORY_LINES_SHOWN} transactions (newest first):")
+    for line in reversed(lines[-HISTORY_LINES_SHOWN:]):
+        print(line)
+
+
+def run_menu(balance_file, history_file):
     balance = load_balance(balance_file)
     print("Family Bank ATM (demo)")
 
@@ -40,8 +68,9 @@ def run_menu(balance_file):
         print("\n1. Check Balance")
         print("2. Deposit Money")
         print("3. Withdraw Money")
-        print("4. Exit")
-        choice = input("Choose an option (1, 2, 3, or 4): ").strip()
+        print("4. Transaction History")
+        print("5. Exit")
+        choice = input("Choose an option (1, 2, 3, 4, or 5): ").strip()
 
         if choice == "1":
             print(f"Current Balance: ${balance}")
@@ -55,6 +84,7 @@ def run_menu(balance_file):
                 else:
                     balance += deposit
                     save_balance(balance_file, balance)
+                    record_transaction(history_file, "Deposit", deposit, balance)
                     print("Deposit successful!")
                     print(f"New Balance: ${balance}")
         elif choice == "3":
@@ -67,19 +97,22 @@ def run_menu(balance_file):
                 else:
                     balance -= withdrawal
                     save_balance(balance_file, balance)
+                    record_transaction(history_file, "Withdrawal", withdrawal, balance)
                     print("Withdrawal successful!")
                     print(f"Remaining Balance: ${balance}")
         elif choice == "4":
+            show_history(history_file)
+        elif choice == "5":
             print("Thank you for using the Family Bank ATM demo.")
             break
         else:
-            print("Invalid option. Please choose 1, 2, 3, or 4.")
+            print("Invalid option. Please choose 1, 2, 3, 4, or 5.")
 
 
-def main(balance_file=BALANCE_FILE):
+def main(balance_file=BALANCE_FILE, history_file=HISTORY_FILE):
     # Ctrl+C or Ctrl+Z ends the program politely instead of showing an error.
     try:
-        run_menu(balance_file)
+        run_menu(balance_file, history_file)
     except (KeyboardInterrupt, EOFError):
         print("\nThank you for using the Family Bank ATM demo.")
 

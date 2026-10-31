@@ -15,17 +15,19 @@ A fictional banking website concept and Python learning project.
 - Admin-only SQLite backup, restore, and account CSV export
 
 ### ATM Simulator
-- Menu loop for checking balance, depositing, withdrawing, or exiting
+- Menu loop for checking balance, depositing, withdrawing, viewing transaction history, or exiting
+- Successful deposits and withdrawals are logged to a local `atm_history.txt` file (delete it to clear the history); option 4 shows the 10 most recent, newest first
 - Starts with a simulated $1,000 balance, then saves changes to a local `atm_balance.txt` file so the balance carries over between runs (delete the file to reset it)
 - Deposits and withdrawals accept positive whole-dollar amounts written with plain digits; the demo balance is limited to $1,000,000
 - Ctrl+C or Ctrl+Z exits politely
 
 ### Login Checker
-- Standalone format-validation exercise; it does not authenticate users
-- Usernames must be 3-20 ASCII letters, numbers, or underscores
-- Passwords must be at least 8 characters and contain uppercase, lowercase, and numeric characters
-- Allows up to three tries to enter values that meet those format rules
-- Run with `python login_checker.py`; tests are included in the test suite
+- Standalone exercise (not connected to the Flask app) that checks a login against a real stored account
+- On first run it asks you to create an account: usernames are 3-20 ASCII letters, numbers, or underscores; passwords need 8+ characters with uppercase, lowercase, and a number
+- Only a random salt and a PBKDF2 hash are saved, in a local `login_account.json` file (git-ignored); the password itself is never stored or printed. Delete the file to create a new account
+- Then allows three login attempts; wrong attempts get one generic message that doesn't say whether the username or password was wrong
+- Passwords are typed hidden using `getpass`
+- Run with `python login_checker.py`; tests are included in the test suite. Use made-up credentials only
 
 ## Tools Used
 

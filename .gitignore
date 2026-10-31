@@ -1,4 +1,6 @@
 /instance/
 atm_balance.txt
+atm_history.txt
+login_account.json
 __pycache__/
 .venv/
