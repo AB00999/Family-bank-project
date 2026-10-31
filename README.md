@@ -15,13 +15,16 @@ A fictional banking website concept and Python learning project.
 - Admin-only SQLite backup, restore, and account CSV export
 
 ### ATM Simulator
-- Check Balance
-- Withdraw Money
-- Deposit Money
+- Menu loop for checking balance, depositing, withdrawing, or exiting
+- Starts with a simulated $1,000 balance, then saves changes to a local `atm_balance.txt` file so the balance carries over between runs (delete the file to reset it)
+- Deposits and withdrawals accept positive whole-dollar amounts
 
 ### Login Checker
-- Username Validation
-- Password Validation
+- Standalone format-validation exercise; it does not authenticate users
+- Usernames must be 3-20 ASCII letters, numbers, or underscores
+- Passwords must be at least 8 characters and contain uppercase, lowercase, and numeric characters
+- Allows up to three tries to enter values that meet those format rules
+- Run with `python login_checker.py`; tests are included in the test suite
 
 ## Tools Used
 
