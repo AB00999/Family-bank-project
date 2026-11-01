@@ -22,6 +22,12 @@ A fictional banking website concept and Python learning project.
 - Starts with a simulated $1,000 balance, then saves changes to a local `atm_balance.txt` file so the balance carries over between runs (delete the file to reset it)
 - Deposits and withdrawals accept positive whole-dollar amounts written with plain digits; the demo balance is limited to $1,000,000
 - Ctrl+C or Ctrl+Z exits politely
+- Amounts are shown with commas (for example $1,250), and the balance file is saved safely (written to a temporary file first) with a clear warning if saving fails
+
+### Password Generator and Forgot-Password Demo (`docs/test.py`)
+- Standalone exercise (not connected to the main Flask app and not part of the test suite)
+- Run `python docs/test.py` to generate a random password with the `secrets` module: choose a length (8 or more, default 16) and whether to include uppercase letters, numbers, and symbols; at least one character from each chosen group is guaranteed
+- Run `python docs/test.py --web` to start a small demo page at `http://127.0.0.1:5003/forgot-password`; it creates a random reset token and prints a demo link in the terminal instead of sending a real email, and always replies "If that email exists, a reset link was sent." Tokens are only kept in memory and the reset page itself is not built
 
 ### Login Checker
 - Standalone exercise (not connected to the Flask app) that checks a login against a real stored account

@@ -28,18 +28,28 @@ def read_amount(prompt):
     return None
 
 
+def money(amount):
+    # 1250 -> "$1,250"
+    return f"${amount:,}"
+
+
 def save_balance(balance_file, balance):
+    # Write to a temporary file first, then swap it in, so a crash while
+    # saving can never leave a half-written balance file.
+    balance_file = Path(balance_file)
+    temp_file = balance_file.with_name(balance_file.name + ".tmp")
     try:
-        Path(balance_file).write_text(str(balance))
+        temp_file.write_text(str(balance))
+        temp_file.replace(balance_file)
     except OSError:
-        print("Warning: your balance could not be saved.")
+        print("Warning: your balance could not be saved, so it will reset to the last saved amount next time.")
 
 
 def record_transaction(history_file, kind, amount, balance):
     # Add one line to the end of the history file, e.g.
     # "2026-10-31 17:00 | Deposit | $250 | Balance: $1250"
     when = datetime.now().strftime("%Y-%m-%d %H:%M")
-    line = f"{when} | {kind} | ${amount} | Balance: ${balance}\n"
+    line = f"{when} | {kind} | {money(amount)} | Balance: {money(balance)}\n"
     try:
         with open(history_file, "a") as file:
             file.write(line)
@@ -73,20 +83,20 @@ def run_menu(balance_file, history_file):
         choice = input("Choose an option (1, 2, 3, 4, or 5): ").strip()
 
         if choice == "1":
-            print(f"Current Balance: ${balance}")
+            print(f"Current Balance: {money(balance)}")
         elif choice == "2":
             deposit = read_amount("How much would you like to deposit? Enter whole dollars: ")
             if deposit is not None:
                 if deposit <= 0:
                     print("Please enter an amount greater than $0.")
                 elif balance + deposit > MAX_BALANCE:
-                    print(f"Deposit not allowed: the demo balance limit is ${MAX_BALANCE:,}.")
+                    print(f"Deposit not allowed: the demo balance limit is {money(MAX_BALANCE)}.")
                 else:
                     balance += deposit
                     save_balance(balance_file, balance)
                     record_transaction(history_file, "Deposit", deposit, balance)
                     print("Deposit successful!")
-                    print(f"New Balance: ${balance}")
+                    print(f"New Balance: {money(balance)}")
         elif choice == "3":
             withdrawal = read_amount("How much would you like to withdraw? Enter whole dollars: ")
             if withdrawal is not None:
@@ -99,7 +109,7 @@ def run_menu(balance_file, history_file):
                     save_balance(balance_file, balance)
                     record_transaction(history_file, "Withdrawal", withdrawal, balance)
                     print("Withdrawal successful!")
-                    print(f"Remaining Balance: ${balance}")
+                    print(f"Remaining Balance: {money(balance)}")
         elif choice == "4":
             show_history(history_file)
         elif choice == "5":
