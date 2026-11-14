@@ -365,6 +365,96 @@ class FamilyBankFeatureTests(unittest.TestCase):
         self.assertEqual(admin_response.status_code, 200)
         self.assertIn(b"SQLite demo database", admin_response.data)
 
+    def register(self, **overrides):
+        data = {
+            "csrf_token": self.csrf_token(),
+            "username": "new_demo",
+            "email": "new@example.test",
+            "phone_number": "555-0101",
+            "password": "new-test-password-123",
+        }
+        data.update(overrides)
+        return self.client.post("/register", data=data)
+
+    def count_users(self):
+        with closing(family_bank.connect_database()) as connection:
+            return connection.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+
+    def test_duplicate_registration_does_not_reveal_which_detail_is_taken(self):
+        self.create_user(username="taken_user", email="taken@example.test")
+
+        same_email = self.register(email="taken@example.test")
+        same_username = self.register(username="taken_user")
+
+        for response in (same_email, same_username):
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b"couldn&#39;t create that account", response.data)
+            self.assertNotIn(b"already registered", response.data)
+        self.assertEqual(self.count_users(), 1)
+
+    def test_registration_rejects_invalid_details(self):
+        bad_inputs = [
+            {"username": "ab"},
+            {"email": "not-an-email"},
+            {"phone_number": "123"},
+            {"password": "short"},
+        ]
+        for overrides in bad_inputs:
+            response = self.register(**overrides)
+            self.assertEqual(response.status_code, 200, overrides)
+        self.assertEqual(self.count_users(), 0)
+
+    def test_registration_without_csrf_token_is_rejected(self):
+        response = self.register(csrf_token="wrong-token")
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(self.count_users(), 0)
+
+    def login(self, username="demo_user", password="old-test-password-123"):
+        return self.client.post(
+            "/login",
+            data={
+                "csrf_token": self.csrf_token(),
+                "username": username,
+                "password": password,
+            },
+        )
+
+    def test_login_succeeds_with_correct_password(self):
+        self.create_user()
+        response = self.login()
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.headers["Location"].endswith("/dashboard"))
+        self.assertEqual(self.client.get("/dashboard").status_code, 200)
+
+    def test_login_failures_use_the_same_message_for_every_reason(self):
+        self.create_user()
+        locked_id = self.create_user(username="locked_user")
+        with closing(family_bank.connect_database()) as connection:
+            with connection:
+                connection.execute(
+                    "UPDATE users SET is_locked = 1 WHERE id = ?", (locked_id,)
+                )
+
+        attempts = [
+            self.login(password="wrong-password-123"),
+            self.login(username="nobody_here"),
+            self.login(username="locked_user"),
+        ]
+        for response in attempts:
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b"Username or password is incorrect.", response.data)
+        self.assertEqual(self.client.get("/dashboard").status_code, 302)
+
+    def test_dashboard_requires_sign_in_and_logout_ends_the_session(self):
+        self.assertEqual(self.client.get("/dashboard").status_code, 302)
+
+        user_id = self.create_user()
+        self.sign_in_as(user_id)
+        self.assertEqual(self.client.get("/dashboard").status_code, 200)
+
+        self.client.post("/logout", data={"csrf_token": "test-csrf-token"})
+        self.assertEqual(self.client.get("/dashboard").status_code, 302)
+
     def test_paper_investments_require_sign_in(self):
         response = self.client.get("/investments")
         self.assertEqual(response.status_code, 302)
