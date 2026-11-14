@@ -13,6 +13,7 @@ A fictional banking website concept and Python learning project.
 - Flask sign-in and registration demo
 - SQLite stores password hashes, never plaintext passwords
 - Demo dashboard with clearly simulated balances and a paginated transaction history
+- Sign-in-protected practice stock simulator with separate virtual cash and a simulated trade log
 - Optional one-time, expiring password-reset email through locally configured SMTP
 - Admin-only SQLite backup, restore, and account CSV export
 
@@ -67,6 +68,7 @@ Registration collects an email address and phone number and records account crea
 The admin page also shows the latest 100 security audit events (account creation, successful/failed sign-in, locked-account sign-in attempts, sign-out, lock/unlock, role changes, password resets, and deletions). Events do not store passwords or submitted login details.
 Admin accounts can lock/unlock demo users, assign Admin/Technician/User roles, reset a demo password, and delete a user account. These actions require CSRF-protected POST requests; deletion requires typing the username. The current admin cannot lock or delete their own account, and the last active admin cannot be locked, demoted, or deleted. Locking, deleting, role changes, and password resets invalidate that account's existing sessions. Password resets are local and do not send passwords by email. The admin page never displays passwords or hashes.
 The dashboard shows a simulated ledger (an illustrative opening balance and sample activity); it does not represent real funds or permit actual transfers. Admins can export account summaries to CSV, download a consistent SQLite backup, and restore a validated backup. Restores first create a recovery backup and are limited to 25 MB. Only restore trusted files. Backups contain sensitive demo account data and password hashes, so keep them private.
+The stock simulator at `/investments` is also practice-only. Each account starts with $10,000 in separate virtual cash; buys and sells use prices entered by the user, and symbols are not verified. Users can update an owned stock's estimated price without making a trade; a later trade replaces that estimate. Unrealized gain or loss compares the estimated value with the remaining shares' average cost (rounded to the nearest cent), excluding sold shares. It does not retrieve live quotes, connect to a broker, execute real orders, or affect the demo bank balance.
 The self-service password reset uses a random, single-use token stored only as a hash and expires after 30 minutes. To send links, configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURITY` (`starttls` or `ssl`), `SMTP_FROM`, `SMTP_USERNAME`, `SMTP_PASSWORD`, and `PUBLIC_BASE_URL` in the local process environment. For non-local URLs, `PUBLIC_BASE_URL` must use HTTPS. Keep SMTP credentials out of source control and chat; do not enable this app for public access.
 Technicians can view the latest 100 application event types and timestamps at `/technician/activity`, without usernames, contact details, or account controls. Admins can also open this view. Regular users cannot access it.
 

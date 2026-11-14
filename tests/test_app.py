@@ -365,6 +365,232 @@ class FamilyBankFeatureTests(unittest.TestCase):
         self.assertEqual(admin_response.status_code, 200)
         self.assertIn(b"SQLite demo database", admin_response.data)
 
+    def test_paper_investments_require_sign_in(self):
+        response = self.client.get("/investments")
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.headers["Location"].endswith("/login"))
+
+    def test_paper_stock_trades_are_private_and_separate_from_bank_ledger(self):
+        user_id = self.create_user()
+        other_user_id = self.create_user(username="other_demo_user")
+        self.sign_in_as(user_id)
+
+        initial = self.client.get("/investments")
+        self.assertEqual(initial.status_code, 200)
+        self.assertIn(b"$10,000.00", initial.data)
+        self.assertIn(b"Practice only", initial.data)
+
+        purchase = self.client.post(
+            "/investments",
+            data={
+                "csrf_token": "test-csrf-token",
+                "ticker": "aapl",
+                "side": "BUY",
+                "shares": "2",
+                "price": "100.00",
+            },
+            follow_redirects=True,
+        )
+        self.assertEqual(purchase.status_code, 200)
+        self.assertIn(b"Simulated: Bought 2 shares of AAPL for $200.00.", purchase.data)
+        self.assertIn(b"AAPL", purchase.data)
+        self.assertIn(b"$9,800.00", purchase.data)
+
+        sale = self.client.post(
+            "/investments",
+            data={
+                "csrf_token": "test-csrf-token",
+                "ticker": "AAPL",
+                "side": "SELL",
+                "shares": "1",
+                "price": "125.00",
+            },
+            follow_redirects=True,
+        )
+        self.assertEqual(sale.status_code, 200)
+        self.assertIn(b"$9,925.00", sale.data)
+        self.assertIn(b"$10,050.00", sale.data)
+
+        with closing(family_bank.connect_database()) as connection:
+            bank_balance = connection.execute(
+                "SELECT SUM(amount_cents) FROM transactions WHERE user_id = ?",
+                (user_id,),
+            ).fetchone()[0]
+            remaining_shares = connection.execute(
+                """
+                SELECT SUM(CASE side WHEN 'BUY' THEN shares ELSE -shares END)
+                FROM paper_stock_trades
+                WHERE user_id = ? AND ticker = 'AAPL'
+                """,
+                (user_id,),
+            ).fetchone()[0]
+        self.assertEqual(bank_balance, 258300)
+        self.assertEqual(remaining_shares, 1)
+
+        self.sign_in_as(other_user_id)
+        other_portfolio = self.client.get("/investments")
+        self.assertEqual(other_portfolio.status_code, 200)
+        self.assertNotIn(b">AAPL</td>", other_portfolio.data)
+        self.assertIn(b"No simulated stocks yet", other_portfolio.data)
+        self.assertIn(b"$10,000.00", other_portfolio.data)
+
+    def test_paper_trades_reject_invalid_prices_insufficient_cash_and_overselling(self):
+        user_id = self.create_user()
+        self.sign_in_as(user_id)
+
+        invalid_price = self.client.post(
+            "/investments",
+            data={
+                "csrf_token": "test-csrf-token",
+                "ticker": "AAPL",
+                "side": "BUY",
+                "shares": "1",
+                "price": "10.999",
+            },
+            follow_redirects=True,
+        )
+        self.assertIn(b"positive price with at most two decimal places", invalid_price.data)
+
+        insufficient_cash = self.client.post(
+            "/investments",
+            data={
+                "csrf_token": "test-csrf-token",
+                "ticker": "AAPL",
+                "side": "BUY",
+                "shares": "101",
+                "price": "100.00",
+            },
+            follow_redirects=True,
+        )
+        self.assertIn(b"Not enough virtual cash", insufficient_cash.data)
+
+        oversell = self.client.post(
+            "/investments",
+            data={
+                "csrf_token": "test-csrf-token",
+                "ticker": "AAPL",
+                "side": "SELL",
+                "shares": "1",
+                "price": "100.00",
+            },
+            follow_redirects=True,
+        )
+        self.assertIn(b"cannot sell more simulated shares", oversell.data)
+
+        invalid_csrf = self.client.post(
+            "/investments",
+            data={
+                "csrf_token": "wrong-token",
+                "ticker": "AAPL",
+                "side": "BUY",
+                "shares": "1",
+                "price": "100.00",
+            },
+        )
+        self.assertEqual(invalid_csrf.status_code, 302)
+
+        with closing(family_bank.connect_database()) as connection:
+            trade_count = connection.execute(
+                "SELECT COUNT(*) FROM paper_stock_trades WHERE user_id = ?",
+                (user_id,),
+            ).fetchone()[0]
+            cash = connection.execute(
+                "SELECT cash_cents FROM paper_portfolios WHERE user_id = ?",
+                (user_id,),
+            ).fetchone()[0]
+        self.assertEqual(trade_count, 0)
+        self.assertEqual(cash, family_bank.PAPER_STARTING_CASH_CENTS)
+
+    def test_paper_price_updates_and_average_cost_after_partial_sale(self):
+        user_id = self.create_user()
+        self.sign_in_as(user_id)
+        for side, shares, price in (
+            ("BUY", "2", "10.00"),
+            ("BUY", "1", "20.00"),
+            ("SELL", "1", "100.00"),
+        ):
+            response = self.client.post(
+                "/investments",
+                data={
+                    "csrf_token": "test-csrf-token",
+                    "ticker": "aapl",
+                    "side": side,
+                    "shares": shares,
+                    "price": price,
+                },
+                follow_redirects=True,
+            )
+            self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Simulated: Sold 1 share of AAPL for $100.00.", response.data)
+
+        updated = self.client.post(
+            "/investments/price",
+            data={"csrf_token": "test-csrf-token", "ticker": "AAPL", "price": "5.00"},
+            follow_redirects=True,
+        )
+        self.assertIn(b"Simulated price for AAPL updated to $5.00.", updated.data)
+        self.assertIn(b"$10,060.00", updated.data)
+        self.assertIn(b"$10,070.00", updated.data)
+        self.assertIn(b"$26.67", updated.data)
+        self.assertIn(b"-$16.67", updated.data)
+        self.assertIn(b"Symbols are not verified", updated.data)
+        self.assertIn(b"-$16.67", self.client.get("/investments").data)
+        with closing(family_bank.connect_database()) as connection:
+            trades = connection.execute(
+                "SELECT COUNT(*) FROM paper_stock_trades WHERE user_id = ?", (user_id,)
+            ).fetchone()[0]
+        self.assertEqual(trades, 3)
+
+        purchase = self.client.post(
+            "/investments",
+            data={
+                "csrf_token": "test-csrf-token", "ticker": "AAPL", "side": "BUY",
+                "shares": "1", "price": "7.00",
+            },
+            follow_redirects=True,
+        )
+        self.assertIn(b"$21.00", purchase.data)
+        self.assertIn(b"-$12.67", purchase.data)
+
+        gain = self.client.post(
+            "/investments/price",
+            data={"csrf_token": "test-csrf-token", "ticker": "AAPL", "price": "20"},
+            follow_redirects=True,
+        )
+        self.assertIn(b"$26.33", gain.data)
+
+    def test_price_updates_require_owned_shares_valid_price_and_csrf(self):
+        user_id = self.create_user()
+        other_id = self.create_user(username="other_demo_user")
+        self.sign_in_as(user_id)
+        self.client.post(
+            "/investments",
+            data={
+                "csrf_token": "test-csrf-token", "ticker": "XYZ", "side": "BUY",
+                "shares": "1", "price": "10",
+            },
+        )
+        for token, ticker, price, error in (
+            ("test-csrf-token", "XYZ", "0", b"positive price"),
+            ("test-csrf-token", "NONE", "50", b"only update a stock you own"),
+            ("wrong-token", "XYZ", "50", b"form expired"),
+        ):
+            response = self.client.post(
+                "/investments/price",
+                data={"csrf_token": token, "ticker": ticker, "price": price},
+                follow_redirects=True,
+            )
+            self.assertIn(error, response.data)
+        self.sign_in_as(other_id)
+        response = self.client.post(
+            "/investments/price",
+            data={"csrf_token": "test-csrf-token", "ticker": "XYZ", "price": "50"},
+            follow_redirects=True,
+        )
+        self.assertIn(b"only update a stock you own", response.data)
+        self.sign_in_as(user_id)
+        self.assertIn(b"$10.00", self.client.get("/investments").data)
+
 
 if __name__ == "__main__":
     unittest.main()

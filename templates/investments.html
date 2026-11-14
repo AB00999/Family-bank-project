@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% block title %}Stock simulator | Family Bank Concept{% endblock %}
+{% block content %}
+<style>
+    .investment-page { width: min(100%, 900px); }
+    .investment-page h1 { margin-bottom: 6px; }
+    .investment-page .intro { margin-bottom: 18px; }
+    .investment-notice {
+        margin: 0 0 20px;
+        padding: 14px 16px;
+        border: 1px solid #dce3e9;
+        border-radius: 6px;
+        background: #f3f6f8;
+        color: #40566b;
+        font-size: .9rem;
+    }
+    .portfolio-summary {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    .summary-card, .investment-panel {
+        padding: clamp(18px, 4vw, 26px);
+        border: 1px solid #dce3e9;
+        border-radius: 6px;
+        background: white;
+    }
+    .summary-label { margin: 0 0 4px; color: #53677a; font-size: .82rem; }
+    .summary-value { margin: 0; color: #20344a; font-size: 1.45rem; font-weight: 750; }
+    .investment-panel { margin-top: 18px; }
+    .investment-panel h2 { margin: 0 0 14px; font-size: 1.12rem; }
+    .investment-help { margin: 0 0 14px; color: #53677a; font-size: .85rem; }
+    .trade-form {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        align-items: end;
+    }
+    .trade-form .field { display: grid; gap: 6px; margin: 0; }
+    .trade-form label { font-size: .85rem; font-weight: 700; }
+    .trade-form input, .trade-form select {
+        width: 100%;
+        min-height: 44px;
+        padding: 9px 11px;
+        border: 1px solid #cbd5dc;
+        border-radius: 4px;
+        color: #20344a;
+        font: inherit;
+    }
+    .trade-form button {
+        min-height: 44px;
+        margin: 0;
+        padding: 8px 14px;
+        border: 0;
+        border-radius: 4px;
+        background: #176447;
+        color: white;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .trade-form button:hover { background: #124d37; }
+    .table-wrap { overflow-x: auto; }
+    .investment-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .investment-table th {
+        padding: 10px 12px;
+        border-top: 1px solid #dce3e9;
+        border-bottom: 1px solid #dce3e9;
+        background: #f5f7f9;
+        color: #53677a;
+        font-size: .75rem;
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
+    .investment-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e8edf0;
+        font-size: .9rem;
+    }
+    .investment-table tbody tr:last-child td { border-bottom: 0; }
+    .investment-symbol { font-weight: 700; }
+    .investment-number { text-align: right; white-space: nowrap; }
+    .trade-side { font-weight: 700; }
+    .trade-side.BUY { color: #176447; }
+    .trade-side.SELL { color: #8a3c2d; }
+    .empty-list { margin: 0; color: #53677a; }
+    .investment-navigation { margin-top: 20px; }
+    @media (max-width: 700px) {
+        .portfolio-summary { grid-template-columns: 1fr; }
+        .trade-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .investment-table th, .investment-table td { padding: 9px 7px; }
+    }
+    @media (max-width: 420px) {
+        .trade-form { grid-template-columns: 1fr; }
+    }
+</style>
+<section class="investment-page" aria-labelledby="page-title">
+    <h1 id="page-title">Practice stock simulator</h1>
+    <p class="intro">Try recording fictional stock trades with virtual cash.</p>
+    <p class="investment-notice">
+        Practice only: this separate portfolio starts with $10,000 in virtual cash.
+        Enter prices yourself; there are no live quotes, real orders, or connections to your demo bank balance.
+        Symbols are not verified; for example, try AAPL.
+        This is not investment advice.
+    </p>
+
+    <section class="portfolio-summary" aria-label="Virtual portfolio summary">
+        <article class="summary-card">
+            <p class="summary-label">Virtual cash</p>
+            <p class="summary-value">{{ cash }}</p>
+        </article>
+        <article class="summary-card">
+            <p class="summary-label">Estimated stock value</p>
+            <p class="summary-value">{{ investment_value }}</p>
+        </article>
+        <article class="summary-card">
+            <p class="summary-label">Estimated portfolio total</p>
+            <p class="summary-value">{{ portfolio_value }}</p>
+        </article>
+    </section>
+
+    <section class="investment-panel" aria-labelledby="trade-heading">
+        <h2 id="trade-heading">Record a simulated trade</h2>
+        <form class="trade-form" method="post" action="{{ url_for('paper_investments') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="field">
+                <label for="ticker">Stock symbol</label>
+                <input id="ticker" name="ticker" type="text" maxlength="10" placeholder="e.g. AAPL"
+                       pattern="[A-Za-z0-9][A-Za-z0-9.-]{0,9}" autocomplete="off" required>
+            </div>
+            <div class="field">
+                <label for="side">Action</label>
+                <select id="side" name="side" required>
+                    <option value="BUY">Buy</option>
+                    <option value="SELL">Sell</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="shares">Whole shares</label>
+                <input id="shares" name="shares" type="number" min="1" max="999999"
+                       step="1" required>
+            </div>
+            <div class="field">
+                <label for="price">Price per share ($)</label>
+                <input id="price" name="price" type="number" min="0.01"
+                       max="99999999.99" step="0.01" required>
+            </div>
+            <button type="submit">Record trade</button>
+        </form>
+    </section>
+
+    <section class="investment-panel" aria-labelledby="holdings-heading">
+        <h2 id="holdings-heading">Simulated holdings</h2>
+        {% if holdings %}
+            <p class="investment-help">
+                Unrealized gain or loss compares the latest entered price with the average cost of
+                your remaining shares. Values are rounded to the nearest cent; sold shares are excluded.
+            </p>
+            <div class="table-wrap">
+                <table class="investment-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Symbol</th>
+                            <th scope="col" class="investment-number">Shares</th>
+                            <th scope="col" class="investment-number">Last entered price</th>
+                            <th scope="col" class="investment-number">Estimated value</th>
+                            <th scope="col" class="investment-number">Remaining cost</th>
+                            <th scope="col" class="investment-number">Unrealized gain / loss</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for holding in holdings %}
+                            <tr>
+                                <td class="investment-symbol">{{ holding["ticker"] }}</td>
+                                <td class="investment-number">{{ holding["shares"] }}</td>
+                                <td class="investment-number">{{ format_demo_amount(holding["latest_price_cents"]) }}</td>
+                                <td class="investment-number">{{ format_demo_amount(holding["shares"] * holding["latest_price_cents"]) }}</td>
+                                <td class="investment-number">{{ format_demo_amount(holding["cost_cents"]) }}</td>
+                                <td class="investment-number">{{ format_demo_amount(holding["profit_cents"]) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="empty-list">No simulated stocks yet. Record a buy to get started.</p>
+        {% endif %}
+    </section>
+
+    {% if holdings %}
+    <section class="investment-panel" aria-labelledby="price-heading">
+        <h2 id="price-heading">Update a simulated price</h2>
+        <p class="investment-help">Update the estimated value without buying or selling shares. This is not a live quote.</p>
+        <form class="trade-form" method="post" action="{{ url_for('update_paper_price') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="field">
+                <label for="price-ticker">Owned stock</label>
+                <select id="price-ticker" name="ticker" required>
+                    {% for holding in holdings %}
+                        <option value="{{ holding['ticker'] }}">{{ holding["ticker"] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label for="new-price">New price per share ($)</label>
+                <input id="new-price" name="price" type="number" min="0.01"
+                       max="99999999.99" step="0.01" required>
+            </div>
+            <button type="submit">Update price</button>
+        </form>
+    </section>
+    {% endif %}
+
+    <section class="investment-panel" aria-labelledby="trades-heading">
+        <h2 id="trades-heading">Recent simulated trades</h2>
+        {% if trades %}
+            <div class="table-wrap">
+                <table class="investment-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Symbol</th>
+                            <th scope="col">Action</th>
+                            <th scope="col" class="investment-number">Shares</th>
+                            <th scope="col" class="investment-number">Price per share</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trade in trades %}
+                            <tr>
+                                <td><time datetime="{{ trade['occurred_at'] }}">{{ trade["occurred_at"] }}</time></td>
+                                <td class="investment-symbol">{{ trade["ticker"] }}</td>
+                                <td class="trade-side {{ trade['side'] }}">{{ trade["side"] }}</td>
+                                <td class="investment-number">{{ trade["shares"] }}</td>
+                                <td class="investment-number">{{ format_demo_amount(trade["price_cents"]) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="empty-list">No trades recorded.</p>
+        {% endif %}
+    </section>
+    <p class="investment-navigation"><a href="{{ url_for('dashboard') }}">Back to account overview</a></p>
+</section>
+{% endblock %}

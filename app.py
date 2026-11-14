@@ -11,6 +11,7 @@ import tempfile
 from email.message import EmailMessage
 from contextlib import closing
 from datetime import datetime, timedelta, timezone
+from fractions import Fraction
 from functools import wraps
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -42,6 +43,7 @@ app.config.update(
 Path(app.instance_path).mkdir(parents=True, exist_ok=True)
 DATABASE = Path(app.instance_path) / "family_bank.sqlite3"
 BACKUP_DIRECTORY = Path(app.instance_path) / "backups"
+PAPER_STARTING_CASH_CENTS = 1_000_000
 
 
 def initialize_database():
@@ -131,6 +133,7 @@ def initialize_database():
                 ON transactions(user_id, occurred_at DESC, id DESC)
                 """
             )
+            ensure_paper_trading_tables(connection)
             connection.execute(
                 """
                 CREATE TABLE IF NOT EXISTS password_reset_tokens (
@@ -169,6 +172,49 @@ def connect_database():
     connection = sqlite3.connect(DATABASE)
     connection.execute("PRAGMA foreign_keys = ON")
     return connection
+
+
+def ensure_paper_trading_tables(connection):
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS paper_portfolios (
+            user_id INTEGER PRIMARY KEY,
+            cash_cents INTEGER NOT NULL CHECK (cash_cents >= 0),
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+        """
+    )
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS paper_stock_trades (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            ticker TEXT NOT NULL,
+            side TEXT NOT NULL CHECK (side IN ('BUY', 'SELL')),
+            shares INTEGER NOT NULL CHECK (shares > 0),
+            price_cents INTEGER NOT NULL CHECK (price_cents > 0),
+            occurred_at TEXT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+        """
+    )
+    connection.execute(
+        """
+        CREATE INDEX IF NOT EXISTS paper_stock_trades_user_history
+        ON paper_stock_trades(user_id, id DESC)
+        """
+    )
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS paper_stock_prices (
+            user_id INTEGER NOT NULL,
+            ticker TEXT NOT NULL,
+            price_cents INTEGER NOT NULL CHECK (price_cents > 0),
+            PRIMARY KEY (user_id, ticker),
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+        """
+    )
 
 
 def record_audit_event(connection, event_type, user_id=None, details=None):
@@ -667,6 +713,237 @@ def transaction_history():
         page_count=page_count,
         total_count=total_count,
     )
+
+
+def parse_paper_price_cents(value):
+    value = value.strip()
+    if not re.fullmatch(r"\d{1,8}(?:\.\d{1,2})?", value):
+        return None
+
+    whole, _, fractional = value.partition(".")
+    price_cents = int(whole) * 100 + int((fractional + "00")[:2])
+    return price_cents if price_cents > 0 else None
+
+
+@app.route("/investments", methods=["GET", "POST"])
+@login_required
+def paper_investments():
+    if request.method == "POST":
+        if not csrf_token_is_valid():
+            flash("Your form expired. Please try again.", "error")
+            return redirect(url_for("paper_investments"))
+
+        ticker = request.form.get("ticker", "").strip().upper()
+        side = request.form.get("side", "")
+        shares_text = request.form.get("shares", "").strip()
+        price_cents = parse_paper_price_cents(request.form.get("price", ""))
+        if not re.fullmatch(r"[A-Z0-9][A-Z0-9.-]{0,9}", ticker):
+            flash("Enter a valid stock symbol using letters, numbers, . or -.", "error")
+            return redirect(url_for("paper_investments"))
+        if side not in {"BUY", "SELL"}:
+            flash("Choose whether to buy or sell.", "error")
+            return redirect(url_for("paper_investments"))
+        if not re.fullmatch(r"[1-9]\d{0,5}", shares_text):
+            flash("Enter a whole-share quantity from 1 to 999,999.", "error")
+            return redirect(url_for("paper_investments"))
+        if price_cents is None:
+            flash("Enter a positive price with at most two decimal places.", "error")
+            return redirect(url_for("paper_investments"))
+
+        shares = int(shares_text)
+        trade_value_cents = shares * price_cents
+        message = None
+        category = "info"
+        with closing(connect_database()) as connection:
+            with connection:
+                ensure_paper_trading_tables(connection)
+                connection.execute(
+                    """
+                    INSERT OR IGNORE INTO paper_portfolios (user_id, cash_cents)
+                    VALUES (?, ?)
+                    """,
+                    (g.current_user["id"], PAPER_STARTING_CASH_CENTS),
+                )
+                cash_cents = connection.execute(
+                    "SELECT cash_cents FROM paper_portfolios WHERE user_id = ?",
+                    (g.current_user["id"],),
+                ).fetchone()[0]
+
+                if side == "BUY" and trade_value_cents > cash_cents:
+                    message = "Not enough virtual cash for that simulated purchase."
+                    category = "error"
+                elif side == "SELL":
+                    owned_shares = connection.execute(
+                        """
+                        SELECT COALESCE(SUM(
+                            CASE side WHEN 'BUY' THEN shares ELSE -shares END
+                        ), 0)
+                        FROM paper_stock_trades
+                        WHERE user_id = ? AND ticker = ?
+                        """,
+                        (g.current_user["id"], ticker),
+                    ).fetchone()[0]
+                    if shares > owned_shares:
+                        message = "You cannot sell more simulated shares than you own."
+                        category = "error"
+
+                if message is None:
+                    cash_change = (
+                        -trade_value_cents if side == "BUY" else trade_value_cents
+                    )
+                    connection.execute(
+                        """
+                        UPDATE paper_portfolios
+                        SET cash_cents = cash_cents + ?
+                        WHERE user_id = ?
+                        """,
+                        (cash_change, g.current_user["id"]),
+                    )
+                    connection.execute(
+                        """
+                        INSERT INTO paper_stock_trades (
+                            user_id, ticker, side, shares, price_cents, occurred_at
+                        )
+                        VALUES (?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            g.current_user["id"],
+                            ticker,
+                            side,
+                            shares,
+                            price_cents,
+                            utc_timestamp(),
+                        ),
+                    )
+                    connection.execute(
+                        "DELETE FROM paper_stock_prices WHERE user_id = ? AND ticker = ?",
+                        (g.current_user["id"], ticker),
+                    )
+                    message = (
+                        f"Simulated: {'Bought' if side == 'BUY' else 'Sold'} {shares} "
+                        f"share{'s' if shares != 1 else ''} of {ticker} "
+                        f"for {format_demo_amount(trade_value_cents)}."
+                    )
+
+        flash(message, category)
+        return redirect(url_for("paper_investments"))
+
+    with closing(connect_database()) as connection:
+        connection.row_factory = sqlite3.Row
+        with connection:
+            ensure_paper_trading_tables(connection)
+            connection.execute(
+                """
+                INSERT OR IGNORE INTO paper_portfolios (user_id, cash_cents)
+                VALUES (?, ?)
+                """,
+                (g.current_user["id"], PAPER_STARTING_CASH_CENTS),
+            )
+        cash_cents = connection.execute(
+            "SELECT cash_cents FROM paper_portfolios WHERE user_id = ?",
+            (g.current_user["id"],),
+        ).fetchone()["cash_cents"]
+        all_trades = connection.execute(
+            """
+            SELECT ticker, side, shares, price_cents, occurred_at
+            FROM paper_stock_trades
+            WHERE user_id = ?
+            ORDER BY id
+            """,
+            (g.current_user["id"],),
+        ).fetchall()
+        prices = {
+            row["ticker"]: row["price_cents"]
+            for row in connection.execute(
+                "SELECT ticker, price_cents FROM paper_stock_prices WHERE user_id = ?",
+                (g.current_user["id"],),
+            )
+        }
+
+    positions = {}
+    for trade in all_trades:
+        ticker = trade["ticker"]
+        if ticker not in positions:
+            positions[ticker] = {
+                "ticker": ticker, "shares": 0, "cost_cents": Fraction(0),
+                "latest_price_cents": trade["price_cents"],
+            }
+        position = positions[ticker]
+        if trade["side"] == "BUY":
+            position["shares"] += trade["shares"]
+            position["cost_cents"] += trade["shares"] * trade["price_cents"]
+        else:
+            remaining_shares = position["shares"] - trade["shares"]
+            position["cost_cents"] *= Fraction(remaining_shares, position["shares"])
+            position["shares"] = remaining_shares
+        position["latest_price_cents"] = trade["price_cents"]
+
+    holdings = []
+    for ticker, position in sorted(positions.items()):
+        if position["shares"] == 0:
+            continue
+        position["latest_price_cents"] = prices.get(ticker, position["latest_price_cents"])
+        value_cents = position["shares"] * position["latest_price_cents"]
+        position["cost_cents"] = round(position["cost_cents"])
+        position["profit_cents"] = value_cents - position["cost_cents"]
+        holdings.append(position)
+
+    investment_value_cents = sum(
+        holding["shares"] * holding["latest_price_cents"] for holding in holdings
+    )
+    return render_template(
+        "investments.html",
+        cash=format_demo_amount(cash_cents),
+        holdings=holdings,
+        investment_value=format_demo_amount(investment_value_cents),
+        portfolio_value=format_demo_amount(cash_cents + investment_value_cents),
+        trades=list(reversed(all_trades[-20:])),
+    )
+
+
+@app.route("/investments/price", methods=["POST"])
+@login_required
+def update_paper_price():
+    if not csrf_token_is_valid():
+        flash("Your form expired. Please try again.", "error")
+        return redirect(url_for("paper_investments"))
+
+    ticker = request.form.get("ticker", "").strip().upper()
+    price_cents = parse_paper_price_cents(request.form.get("price", ""))
+    if not re.fullmatch(r"[A-Z0-9][A-Z0-9.-]{0,9}", ticker):
+        flash("Enter a valid stock symbol using letters, numbers, . or -.", "error")
+        return redirect(url_for("paper_investments"))
+    if price_cents is None:
+        flash("Enter a positive price with at most two decimal places.", "error")
+        return redirect(url_for("paper_investments"))
+
+    with closing(connect_database()) as connection:
+        with connection:
+            connection.execute("BEGIN IMMEDIATE")
+            ensure_paper_trading_tables(connection)
+            shares = connection.execute(
+                """
+                SELECT COALESCE(SUM(
+                    CASE side WHEN 'BUY' THEN shares ELSE -shares END
+                ), 0)
+                FROM paper_stock_trades WHERE user_id = ? AND ticker = ?
+                """,
+                (g.current_user["id"], ticker),
+            ).fetchone()[0]
+            if shares <= 0:
+                flash("You can only update a stock you own.", "error")
+                return redirect(url_for("paper_investments"))
+            connection.execute(
+                """
+                INSERT INTO paper_stock_prices (user_id, ticker, price_cents)
+                VALUES (?, ?, ?)
+                ON CONFLICT(user_id, ticker) DO UPDATE SET price_cents = excluded.price_cents
+                """,
+                (g.current_user["id"], ticker, price_cents),
+            )
+
+    flash(f"Simulated price for {ticker} updated to {format_demo_amount(price_cents)}.", "info")
+    return redirect(url_for("paper_investments"))
 
 
 @app.route("/forgot-password", methods=["GET", "POST"])

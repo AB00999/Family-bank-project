@@ -141,6 +141,7 @@
     <nav class="account-navigation" aria-label="Account navigation">
         <a href="{{ url_for('dashboard') }}" aria-current="page">Overview</a>
         <a href="{{ url_for('transaction_history') }}">Account activity</a>
+        <a href="{{ url_for('paper_investments') }}">Stock simulator</a>
         {% if role in ("Admin", "Technician") %}
             <a href="{{ url_for('technician_activity') }}">Technical activity</a>
         {% endif %}
