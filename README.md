@@ -1,5 +1,10 @@
 # Family project
 
+[![Tests](https://github.com/AB00999/Family-bank-project/workflows/Tests/badge.svg)](https://github.com/AB00999/Family-bank-project/actions/workflows/tests.yml)
+[![CodeQL](https://github.com/AB00999/Family-bank-project/workflows/CodeQL/badge.svg)](https://github.com/AB00999/Family-bank-project/security/code-scanning)
+[![codecov](https://codecov.io/gh/AB00999/Family-bank-project/branch/main/graph/badge.svg)](https://codecov.io/gh/AB00999/Family-bank-project)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
+
 ![Family Bank preview](docs/images/social-preview.png)
 
 ## About
