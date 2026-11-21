@@ -621,8 +621,11 @@ class FamilyBankFeatureTests(unittest.TestCase):
         self.assertIn(b"Simulated price for AAPL updated to $5.00.", updated.data)
         self.assertIn(b"$10,060.00", updated.data)
         self.assertIn(b"$10,070.00", updated.data)
+        self.assertIn(b"$13.33", updated.data)
         self.assertIn(b"$26.67", updated.data)
         self.assertIn(b"-$16.67", updated.data)
+        self.assertIn(b"-62.50%", updated.data)
+        self.assertIn(b"profit-negative", updated.data)
         self.assertIn(b"Symbols are not verified", updated.data)
         self.assertIn(b"-$16.67", self.client.get("/investments").data)
         with closing(family_bank.connect_database()) as connection:
@@ -648,6 +651,9 @@ class FamilyBankFeatureTests(unittest.TestCase):
             follow_redirects=True,
         )
         self.assertIn(b"$26.33", gain.data)
+        self.assertIn(b"+$26.33", gain.data)
+        self.assertIn(b"+78.20%", gain.data)
+        self.assertIn(b"profit-positive", gain.data)
 
     def test_price_updates_require_owned_shares_valid_price_and_csrf(self):
         user_id = self.create_user()

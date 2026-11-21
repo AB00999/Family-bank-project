@@ -237,6 +237,22 @@ def format_demo_amount(amount_cents):
     return f"{sign}${dollars:,}.{cents:02d}"
 
 
+def format_demo_gain_loss(amount_cents):
+    sign = "+" if amount_cents > 0 else ""
+    return f"{sign}{format_demo_amount(amount_cents)}"
+
+
+def format_demo_percentage(amount_cents, cost_cents):
+    hundredths_of_one_percent = round(
+        Fraction(amount_cents * 10_000, cost_cents)
+    )
+    sign = "+" if hundredths_of_one_percent > 0 else ""
+    if hundredths_of_one_percent < 0:
+        sign = "-"
+    whole_percent, decimal_percent = divmod(abs(hundredths_of_one_percent), 100)
+    return f"{sign}{whole_percent}.{decimal_percent:02d}%"
+
+
 def seed_demo_transactions(connection, user_id):
     already_seeded = connection.execute(
         "SELECT 1 FROM transactions WHERE user_id = ? LIMIT 1",
@@ -884,8 +900,21 @@ def paper_investments():
             continue
         position["latest_price_cents"] = prices.get(ticker, position["latest_price_cents"])
         value_cents = position["shares"] * position["latest_price_cents"]
+        position["average_purchase_price_cents"] = round(
+            position["cost_cents"] / position["shares"]
+        )
         position["cost_cents"] = round(position["cost_cents"])
         position["profit_cents"] = value_cents - position["cost_cents"]
+        position["profit_amount"] = format_demo_gain_loss(position["profit_cents"])
+        position["profit_percentage"] = format_demo_percentage(
+            position["profit_cents"], position["cost_cents"]
+        )
+        if position["profit_cents"] > 0:
+            position["profit_class"] = "profit-positive"
+        elif position["profit_cents"] < 0:
+            position["profit_class"] = "profit-negative"
+        else:
+            position["profit_class"] = "profit-neutral"
         holdings.append(position)
 
     investment_value_cents = sum(

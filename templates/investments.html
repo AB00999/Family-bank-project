@@ -82,6 +82,11 @@
     .investment-table tbody tr:last-child td { border-bottom: 0; }
     .investment-symbol { font-weight: 700; }
     .investment-number { text-align: right; white-space: nowrap; }
+    .profit-positive { color: #176447; }
+    .profit-negative { color: #a12620; }
+    .profit-neutral { color: #53677a; }
+    .profit-value { display: block; font-weight: 750; }
+    .profit-percentage { display: block; margin-top: 2px; font-size: .8rem; }
     .trade-side { font-weight: 700; }
     .trade-side.BUY { color: #176447; }
     .trade-side.SELL { color: #8a3c2d; }
@@ -155,8 +160,9 @@
         <h2 id="holdings-heading">Simulated holdings</h2>
         {% if holdings %}
             <p class="investment-help">
-                Unrealized gain or loss compares the latest entered price with the average cost of
-                your remaining shares. Values are rounded to the nearest cent; sold shares are excluded.
+                Profit or loss compares the current simulated price with the average purchase
+                price and cost basis of your remaining shares. Values are rounded to the nearest
+                cent; sold shares are excluded.
             </p>
             <div class="table-wrap">
                 <table class="investment-table">
@@ -164,10 +170,11 @@
                         <tr>
                             <th scope="col">Symbol</th>
                             <th scope="col" class="investment-number">Shares</th>
-                            <th scope="col" class="investment-number">Last entered price</th>
+                            <th scope="col" class="investment-number">Average purchase price</th>
+                            <th scope="col" class="investment-number">Current simulated price</th>
                             <th scope="col" class="investment-number">Estimated value</th>
-                            <th scope="col" class="investment-number">Remaining cost</th>
-                            <th scope="col" class="investment-number">Unrealized gain / loss</th>
+                            <th scope="col" class="investment-number">Cost basis</th>
+                            <th scope="col" class="investment-number">Profit / loss</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -175,10 +182,14 @@
                             <tr>
                                 <td class="investment-symbol">{{ holding["ticker"] }}</td>
                                 <td class="investment-number">{{ holding["shares"] }}</td>
+                                <td class="investment-number">{{ format_demo_amount(holding["average_purchase_price_cents"]) }}</td>
                                 <td class="investment-number">{{ format_demo_amount(holding["latest_price_cents"]) }}</td>
                                 <td class="investment-number">{{ format_demo_amount(holding["shares"] * holding["latest_price_cents"]) }}</td>
                                 <td class="investment-number">{{ format_demo_amount(holding["cost_cents"]) }}</td>
-                                <td class="investment-number">{{ format_demo_amount(holding["profit_cents"]) }}</td>
+                                <td class="investment-number {{ holding['profit_class'] }}">
+                                    <span class="profit-value">{{ holding["profit_amount"] }}</span>
+                                    <span class="profit-percentage">{{ holding["profit_percentage"] }}</span>
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
