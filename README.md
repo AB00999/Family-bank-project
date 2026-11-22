@@ -54,6 +54,17 @@ A fictional banking website concept and Python learning project.
 - VS Code
 - Flask
 
+## Architecture overview
+
+The main Flask project uses a small, focused structure:
+
+- `app.py` contains route handlers, authentication checks, SQLite migrations, transaction logic, paper-trading calculations, password-reset email handling, and admin operations.
+- `templates/` contains the server-rendered login, dashboard, transaction, investment, reset-password, technician, and admin views.
+- `instance/family_bank.sqlite3` stores the local demo data. The app creates and migrates its tables automatically.
+- `tests/` contains `unittest` coverage for the Flask app, ATM simulator, and login checker.
+- `docs/index.html` is the separate public-safe static concept. It does not connect to the Flask app or collect credentials.
+- GitHub Actions runs the test suite across supported Python versions, and CodeQL performs source-code security analysis.
+
 ## Dependency updates
 
 Dependabot is configured in `.github/dependabot.yml` to check Python dependencies from `requirements.txt` weekly and open up to five version-update pull requests at a time. Review each pull request and run the project tests before merging. To receive security-update pull requests, enable Dependabot alerts and Dependabot security updates in the repository's **Settings → Code security and analysis** page on GitHub.

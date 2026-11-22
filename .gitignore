@@ -1,4 +1,5 @@
 /instance/
+study-hub/*.sqlite3
 atm_balance.txt
 atm_history.txt
 login_account.json

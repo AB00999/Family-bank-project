@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Growth Guides | Study Hub{% endblock %}
+{% block page_title %}Growth guides{% endblock %}
+{% block content %}
+<div class="dashboard knowledge-dashboard">
+    <header class="knowledge-hero">
+        <div>
+            <p class="eyebrow">Knowledge for your next step</p>
+            <h1>Turn goals into a practical plan.</h1>
+            <p>Choose a path, learn the rules, build evidence of progress, and make decisions you can stand behind.</p>
+        </div>
+    </header>
+
+    <aside class="guidance-note">
+        <strong>Use reliable, local guidance</strong>
+        <p>Employment, records, benefits, debt, housing, and legal rules vary by location. Confirm important details with a qualified attorney or a verified local nonprofit, employer, or government office.</p>
+    </aside>
+
+    <section class="resource-strip" aria-label="Trusted resource types">
+        <div><span>01</span><strong>Skills</strong><small>Labs, courses, certifications</small></div>
+        <div><span>02</span><strong>Employment</strong><small>Resume, applications, interviews</small></div>
+        <div><span>03</span><strong>Stability</strong><small>Bills, housing, benefits</small></div>
+        <div><span>04</span><strong>Records</strong><small>Legal aid and official documents</small></div>
+    </section>
+
+    <section class="guide-grid" aria-label="Growth guides">
+        {% for guide in guides %}
+        <article class="guide-card">
+            <div class="guide-card-top">
+                <span class="guide-number">{{ guide.icon }}</span>
+                <small>{{ guide.category }}</small>
+            </div>
+            <h2>{{ guide.title }}</h2>
+            <p>{{ guide.summary }}</p>
+            <ol>
+                {% for step in guide.steps %}
+                <li>{{ step }}</li>
+                {% endfor %}
+            </ol>
+        </article>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}

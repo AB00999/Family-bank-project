@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block page_title %}Overview{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <header class="hero">
+        <div>
+            <p class="eyebrow">Good to see you</p>
+            <h1>Ready for a focused study session?</h1>
+            <p>Choose a subject, set a clear goal, and keep your learning momentum.</p>
+        </div>
+        <div class="minutes-card">
+            <span>Studied today</span>
+            <strong>{{ today_minutes }}</strong>
+            <small>minutes</small>
+        </div>
+    </header>
+
+    <section class="stats-grid" aria-label="Study summary">
+        <article class="stat-card">
+            <span class="stat-icon purple">▦</span>
+            <div><small>Active subjects</small><strong>{{ subjects|length }}</strong></div>
+        </article>
+        <article class="stat-card">
+            <span class="stat-icon green">✓</span>
+            <div><small>Completed goals</small><strong>{{ goals|selectattr("completed", "equalto", 1)|list|length }}</strong></div>
+        </article>
+        <article class="stat-card">
+            <span class="stat-icon orange">◇</span>
+            <div><small>Cards to review</small><strong>{{ cards|length }}</strong></div>
+        </article>
+        <article class="stat-card">
+            <span class="stat-icon blue">◷</span>
+            <div><small>Recent sessions</small><strong>{{ sessions|length }}</strong></div>
+        </article>
+    </section>
+
+    <section class="panel growth-feature">
+        <div>
+            <p class="eyebrow">Knowledge library</p>
+            <h2>Build the life skills you need next.</h2>
+            <p>Explore practical routes for cybersecurity, employment with a record, bill planning, better decisions, and personal growth.</p>
+        </div>
+        <a class="topbar-focus" href="{{ url_for('knowledge') }}">Explore growth guides</a>
+    </section>
+
+    <section class="workspace-grid">
+        <article class="panel subjects-panel" id="subjects">
+            <div class="panel-heading">
+                <div><p class="eyebrow">Library</p><h2>Subjects</h2></div>
+                <span class="count-badge">{{ subjects|length }} total</span>
+            </div>
+            <form class="inline-form" method="post" action="{{ url_for('add_subject') }}">
+                <input name="name" placeholder="New subject" maxlength="60" required>
+                <input class="color" name="color" type="color" value="#4f46e5" aria-label="Subject color">
+                <button type="submit">Add subject</button>
+            </form>
+            <div class="subject-grid">
+                {% for subject in subjects %}
+                    <div class="subject">
+                        <span class="subject-dot" style="background: {{ subject.color }}"></span>
+                        <div><strong>{{ subject.name }}</strong><small>Study subject</small></div>
+                        <form method="post" action="{{ url_for('delete_subject', subject_id=subject.id) }}">
+                            <button class="icon-button" type="submit" aria-label="Delete {{ subject.name }}">×</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <p class="empty">Add a subject to begin.</p>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="panel focus-panel" id="focus">
+            <div class="panel-heading">
+                <div><p class="eyebrow">Focus mode</p><h2>Study timer</h2></div>
+                <span class="live-badge"><i></i> Ready</span>
+            </div>
+            {% if subjects %}
+                <div class="timer" id="timer">25:00</div>
+                <div class="timer-presets" aria-label="Timer presets">
+                    <button type="button" data-minutes="25" class="active">25 min</button>
+                    <button type="button" data-minutes="45">45 min</button>
+                    <button type="button" data-minutes="60">60 min</button>
+                </div>
+                <div class="timer-actions">
+                    <button type="button" id="timer-start">Start</button>
+                    <button type="button" class="secondary" id="timer-reset">Reset</button>
+                </div>
+                <form class="stack-form" method="post" action="{{ url_for('add_session') }}">
+                    <label>Subject
+                        <select name="subject_id" required>
+                            {% for subject in subjects %}<option value="{{ subject.id }}">{{ subject.name }}</option>{% endfor %}
+                        </select>
+                    </label>
+                    <label>Minutes studied
+                        <input name="minutes" type="number" min="0" max="1440" value="25" required>
+                    </label>
+                    <label>Notes
+                        <input name="notes" maxlength="200" placeholder="What did you work on?">
+                    </label>
+                    <button type="submit">Log session</button>
+                </form>
+            {% else %}
+                <p class="empty">Create a subject before starting a session.</p>
+            {% endif %}
+        </article>
+
+        <article class="panel goals-panel" id="goals">
+            <div class="panel-heading">
+                <div><p class="eyebrow">Plan</p><h2>Learning goals</h2></div>
+                <button class="text-button" type="button" id="show-goal-form">+ New goal</button>
+            </div>
+            <div class="goal-form-wrap" id="goal-form">
+            <form class="stack-form" method="post" action="{{ url_for('add_goal') }}">
+                <input name="title" placeholder="Goal title" maxlength="100" required>
+                <div class="split">
+                    <input name="target_minutes" type="number" min="1" placeholder="Target minutes" required>
+                    <input name="due_date" type="date" aria-label="Due date">
+                </div>
+                <button type="submit">Add goal</button>
+            </form>
+            </div>
+            <div class="goal-list">
+                {% for goal in goals %}
+                    <form method="post" action="{{ url_for('toggle_goal', goal_id=goal.id) }}">
+                        <button class="goal {% if goal.completed %}complete{% endif %}" type="submit">
+                            <span class="check">{{ "✓" if goal.completed else "" }}</span>
+                            <span><strong>{{ goal.title }}</strong><small>{{ goal.target_minutes }} minutes{% if goal.due_date %} · due {{ goal.due_date }}{% endif %}</small></span>
+                        </button>
+                    </form>
+                {% else %}
+                    <p class="empty">No goals yet.</p>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="panel flashcards-panel" id="flashcards">
+            <div class="panel-heading">
+                <div><p class="eyebrow">Practice</p><h2>Flashcards</h2></div>
+                <span class="count-badge">{{ cards|length }} to review</span>
+            </div>
+            {% if subjects %}
+                <form class="stack-form" method="post" action="{{ url_for('add_flashcard') }}">
+                    <select name="subject_id" required>
+                        {% for subject in subjects %}<option value="{{ subject.id }}">{{ subject.name }}</option>{% endfor %}
+                    </select>
+                    <input name="question" placeholder="Question" maxlength="300" required>
+                    <input name="answer" placeholder="Answer" maxlength="500" required>
+                    <button type="submit">Add card</button>
+                </form>
+            {% endif %}
+            <div class="cards">
+                {% for card in cards[:5] %}
+                    <article class="flashcard" tabindex="0">
+                        <p><small>{{ card.subject_name }}</small><strong>{{ card.question }}</strong></p>
+                        <p class="answer">{{ card.answer }}</p>
+                        <form method="post" action="{{ url_for('master_flashcard', card_id=card.id) }}">
+                            <button type="submit">Mark mastered</button>
+                        </form>
+                    </article>
+                {% else %}
+                    <p class="empty">No cards waiting for review.</p>
+                {% endfor %}
+            </div>
+        </article>
+    </section>
+
+    <section class="panel history" id="history">
+        <div class="panel-heading">
+            <div><p class="eyebrow">Activity</p><h2>Recent study sessions</h2></div>
+            <a class="text-button" href="#focus">Log a session</a>
+        </div>
+        {% for session in sessions %}
+            <div class="session-row">
+                <span class="session-dot"></span>
+                <strong>{{ session.subject_name }}</strong>
+                <span>{{ session.minutes }} min</span>
+                <span>{{ session.notes or "No notes" }}</span>
+                <time>{{ session.occurred_at }}</time>
+            </div>
+        {% else %}
+            <p class="empty">Your completed study sessions will appear here.</p>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}

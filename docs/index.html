@@ -654,11 +654,11 @@
                 <div class="tour-copy">
                     <p class="eyebrow">A short concept tour</p>
                     <h2 id="tour-title">See the ideas come to life.</h2>
-                    <p id="tour-description" aria-live="polite">Take a quick look at an account overview, a shared family goal, and the design principles behind this fictional concept.</p>
+                    <p id="tour-description" aria-live="polite">Explore a sample overview of the account experience, investment practice, security controls, and people-first design behind this learning project.</p>
                     <div class="tour-controls">
                         <button class="tour-control tour-control-primary" id="tour-play" type="button">▶ Play tour</button>
                         <button class="tour-control" id="tour-replay" type="button">↺ Replay</button>
-                        <p class="tour-caption" id="tour-caption" aria-live="polite">Three scenes · about 15 seconds</p>
+                        <p class="tour-caption" id="tour-caption" aria-live="polite">Four scenes · about 20 seconds</p>
                     </div>
                     <p class="tour-disclaimer">A short animated design preview. Not a real bank, account, or financial product.</p>
                 </div>
@@ -775,27 +775,35 @@
         const tourSteps = [...document.querySelectorAll(".tour-step")];
         const tourScenes = [
             {
-                title: "Everyday overview",
-                label: "Illustrative account display",
-                value: "•••• 0000",
-                description: "A sample account overview can make everyday information feel simple to scan.",
-                aria: "Sample account concept card",
+                title: "Demo dashboard",
+                label: "Illustrative account activity",
+                value: "Made for learning",
+                description: "A calm dashboard presents simulated balances and account activity without representing real funds.",
+                aria: "Sample Family Bank dashboard card",
                 progress: false
             },
             {
-                title: "Shared savings goal",
-                label: "A goal for life's next chapter",
-                value: "Growing together",
-                description: "A visual progress cue can help explain how a family savings goal might be presented.",
-                aria: "Illustration of a family savings goal",
+                title: "Practice investments",
+                label: "Virtual cash and trade history",
+                value: "Simulated gains",
+                description: "The local Flask app includes a sign-in-protected paper-trading experience with estimated prices and gain-loss views.",
+                aria: "Illustration of the practice investment feature",
                 progress: true
+            },
+            {
+                title: "Account controls",
+                label: "Local demo administration",
+                value: "Roles and recovery",
+                description: "The learning app demonstrates role checks, password resets, audit events, CSV exports, and validated database backups.",
+                aria: "Illustration of account administration controls",
+                progress: false
             },
             {
                 title: "People-first design",
                 label: "Clear language, calm layouts",
-                value: "Made for everyone",
-                description: "Responsive layouts and plain language are the focus of this fictional website concept.",
-                aria: "Sample card describing accessible, people-first design",
+                value: "Built for clarity",
+                description: "Responsive layouts, straightforward language, and explicit safety disclaimers keep the concept easy to understand.",
+                aria: "Sample card describing the people-first design approach",
                 progress: false
             }
         ];
@@ -825,7 +833,7 @@
             tourStage.classList.remove("is-playing");
             tourPlayButton.textContent = "▶ Play tour";
             tourPlayButton.setAttribute("aria-pressed", "false");
-            tourCaption.textContent = "Three scenes · about 15 seconds";
+            tourCaption.textContent = "Four scenes · about 20 seconds";
         }
 
         function startTour(restart = false) {
@@ -844,14 +852,14 @@
             tourStage.classList.add("is-playing");
             tourPlayButton.textContent = "❚❚ Pause tour";
             tourPlayButton.setAttribute("aria-pressed", "true");
-            tourCaption.textContent = "Playing scene 1 of 3";
+            tourCaption.textContent = "Playing scene 1 of 4";
             tourTimer = window.setInterval(() => {
                 if (tourIndex >= tourScenes.length - 1) {
                     stopTour();
                     return;
                 }
                 showTourScene(tourIndex + 1);
-                tourCaption.textContent = `Playing scene ${tourIndex + 1} of 3`;
+                tourCaption.textContent = `Playing scene ${tourIndex + 1} of 4`;
             }, 5000);
         }
 

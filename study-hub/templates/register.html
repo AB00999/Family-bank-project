@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Create account | Study Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="auth-page">
+    <main class="auth-shell">
+        <section class="auth-brand">
+            <a class="brand" href="{{ url_for('register') }}"><span>SH</span><strong>Study Hub</strong></a>
+            <div>
+                <p class="eyebrow">Start your workspace</p>
+                <h1>A clearer way to make learning progress.</h1>
+                <p>Create a private local profile for your subjects, goals, cards, and study sessions.</p>
+            </div>
+        </section>
+        <section class="auth-card" aria-labelledby="register-title">
+            <h2 id="register-title">Create account</h2>
+            <p class="auth-subtitle">Set up your Study Hub profile.</p>
+            {% with messages = get_flashed_messages() %}
+                {% for message in messages %}<p class="auth-error">{{ message }}</p>{% endfor %}
+            {% endwith %}
+            <form method="post" class="auth-form">
+                <label>Full name
+                    <input name="name" autocomplete="name" placeholder="Your name" required>
+                </label>
+                <label>Email address
+                    <input name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+                </label>
+                <label>Phone number
+                    <input name="phone" type="tel" autocomplete="tel" placeholder="+1 555 123 4567" required>
+                </label>
+                <label>Password
+                    <input name="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" minlength="8" required>
+                </label>
+                <button type="submit">Create account</button>
+            </form>
+            <p class="auth-switch">Already have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
+        </section>
+    </main>
+</body>
+</html>

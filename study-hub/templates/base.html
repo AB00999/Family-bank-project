@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Study Hub{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <a class="brand" href="{{ url_for('dashboard') }}"><span>SH</span><strong>Study Hub</strong></a>
+            <nav class="side-nav" aria-label="Workspace navigation">
+                <a class="{{ 'active' if request.endpoint == 'dashboard' else '' }}" href="{{ url_for('dashboard') }}"><span>⌂</span>Overview</a>
+                <a class="{{ 'active' if request.endpoint == 'knowledge' else '' }}" href="{{ url_for('knowledge') }}"><span>◎</span>Growth guides</a>
+                {% if request.endpoint == 'dashboard' %}
+                    <a href="#subjects"><span>▦</span>Subjects</a>
+                    <a href="#goals"><span>✓</span>Goals</a>
+                    <a href="#flashcards"><span>◇</span>Flashcards</a>
+                    <a href="#history"><span>◷</span>Study history</a>
+                {% endif %}
+            </nav>
+            <a class="focus-link" href="#focus"><span>+</span>Log study session</a>
+            <div class="profile">
+                <div class="avatar">S</div>
+                <div><strong>{{ user.name if user else "My workspace" }}</strong><small>{{ user.email if user else "Local learning profile" }}</small></div>
+                {% if user %}
+                <form method="post" action="{{ url_for('logout') }}" class="logout-form">
+                    <button type="submit" title="Sign out">↪</button>
+                </form>
+                {% endif %}
+            </div>
+        </aside>
+
+        <div class="main-column">
+            <header class="topbar">
+                <div>
+                    <p class="topbar-kicker">Personal workspace</p>
+                    <strong>{% block page_title %}Overview{% endblock %}</strong>
+                </div>
+                <div class="topbar-actions">
+                    <a class="topbar-button" href="#subjects">Add subject</a>
+                    <a class="topbar-focus" href="#focus">Start focus</a>
+                </div>
+            </header>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-wrap" aria-live="polite">
+                        {% for message in messages %}<p class="flash">{{ message }}</p>{% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            <main>{% block content %}{% endblock %}</main>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

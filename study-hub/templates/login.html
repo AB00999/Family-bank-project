@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign in | Study Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="auth-page">
+    <main class="auth-shell">
+        <section class="auth-brand">
+            <a class="brand" href="{{ url_for('login') }}"><span>SH</span><strong>Study Hub</strong></a>
+            <div>
+                <p class="eyebrow">Personal learning workspace</p>
+                <h1>Build a study routine you can keep.</h1>
+                <p>Organize subjects, set goals, practice flashcards, and record focused sessions.</p>
+            </div>
+        </section>
+        <section class="auth-card" aria-labelledby="signin-title">
+            <h2 id="signin-title">Welcome back</h2>
+            <p class="auth-subtitle">Sign in to continue to your workspace.</p>
+            {% with messages = get_flashed_messages() %}
+                {% for message in messages %}<p class="auth-error">{{ message }}</p>{% endfor %}
+            {% endwith %}
+            <form method="post" class="auth-form">
+                <label>Email address
+                    <input name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+                </label>
+                <label>Password
+                    <input name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+                </label>
+                <button type="submit">Sign in</button>
+            </form>
+            <p class="auth-switch">New to Study Hub? <a href="{{ url_for('register') }}">Create an account</a></p>
+        </section>
+    </main>
+</body>
+</html>
