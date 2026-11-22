@@ -111,10 +111,14 @@ class StudyHubTests(unittest.TestCase):
         response = self.client.get("/early-learning")
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Colors around us", response.data)
-        self.assertIn(b"Birth", response.data)
-        self.assertIn(b"11 months", response.data)
         self.assertIn(b"within arm's reach", response.data)
-        self.assertIn(b"not a test or developmental assessment", response.data)
+        self.assertIn(b"Lesson 10", response.data)
+        self.assertEqual(response.data.count(b'class="lesson-card curriculum-lesson"'), 10)
+        self.assertIn(b"Cyber safety: stop and ask", response.data)
+        self.assertIn(b"AI is a tool, not a person", response.data)
+        self.assertIn(b"Show grown-up answer", response.data)
+        self.assertIn(b"Baby Loves Coding!", response.data)
+        self.assertIn(b"nothing is saved", response.data)
 
 
 if __name__ == "__main__":

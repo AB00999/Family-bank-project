@@ -2,7 +2,7 @@
 
 A local Flask learning dashboard for organizing subjects, goals, flashcards, and study sessions.
 
-Study Hub also includes a public Early Learners page with a short, caregiver-led lesson for children from birth to age 3, with age adaptations and safety notes. The lesson does not require an account or collect child information.
+Study Hub also includes a public Early Learners course with ten short, caregiver-led lessons for children from birth to age 3. It includes read-aloud quizzes, book suggestions, age adaptations, and screen-free computer, cyber safety, and AI activities. It does not require an account or collect child information.
 
 ## Run
 

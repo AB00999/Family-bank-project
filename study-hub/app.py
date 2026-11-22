@@ -264,6 +264,232 @@ GROWTH_GUIDES = [
 ]
 
 
+EARLY_LESSONS = [
+    {
+        "number": "01",
+        "title": "Colors around us",
+        "focus": "Words and noticing",
+        "materials": [
+            "A sturdy board book or large picture with clear colors.",
+            "Two large, intact, age-appropriate soft toys in different colors.",
+        ],
+        "steps": [
+            "Name the color of one object, then pause so the child can look or gesture.",
+            "Offer the second object and say its color in a short, friendly phrase.",
+            "Repeat the words together during a brief read-aloud; stop when the child needs a break.",
+        ],
+        "quiz": {
+            "question": "Which object is blue?",
+            "choices": ["The blue soft toy", "The red book"],
+            "answer": "The blue soft toy. If the child is unsure, point to it and say the color together.",
+        },
+    },
+    {
+        "number": "02",
+        "title": "Count with claps",
+        "focus": "Early number sense",
+        "materials": [
+            "A comfortable place to sit or stand together.",
+            "Your hands; no loose counters or small objects are needed.",
+        ],
+        "steps": [
+            "Clap once gently and say, “One clap.”",
+            "Try two slow claps, counting each one aloud.",
+            "Invite the child to clap, tap knees, or simply listen.",
+        ],
+        "quiz": {
+            "question": "How many claps did we try first?",
+            "choices": ["One", "Ten"],
+            "answer": "One. Count again together; a look, sound, or movement is a response.",
+        },
+    },
+    {
+        "number": "03",
+        "title": "Shapes all around",
+        "focus": "Looking and comparing",
+        "materials": [
+            "A sturdy picture book or large picture showing simple shapes.",
+            "One large, safe household object with a clear round or square shape.",
+        ],
+        "steps": [
+            "Look at a circle and a square in a picture.",
+            "Trace each shape in the air with your finger while naming it.",
+            "Find a similar shape in the room without picking up anything unsafe.",
+        ],
+        "quiz": {
+            "question": "Which shape has a round edge?",
+            "choices": ["A circle", "A square"],
+            "answer": "A circle. Show it in the picture and trace it together.",
+        },
+    },
+    {
+        "number": "04",
+        "title": "Storytime and new words",
+        "focus": "Language and connection",
+        "materials": [
+            "A sturdy board book chosen by the child.",
+            "A cozy, safe place to read together.",
+        ],
+        "steps": [
+            "Let the child look at or choose a page.",
+            "Name one picture and add a few simple words, such as “big, yellow bus.”",
+            "Pause for pointing, sounds, gestures, device-based communication, or a quiet look.",
+        ],
+        "quiz": {
+            "question": "What can we do when we see a picture?",
+            "choices": ["Point to it and talk about it", "Rush to finish the book"],
+            "answer": "Point to it and talk about it. Follow the child's interest and enjoy the moment.",
+        },
+    },
+    {
+        "number": "05",
+        "title": "Feelings and kindness",
+        "focus": "Social and emotional learning",
+        "materials": [
+            "A board book about feelings or familiar faces.",
+            "A trusted adult who can model a kind response.",
+        ],
+        "steps": [
+            "Look at a face in a book and name one feeling, such as happy or sad.",
+            "Model a gentle response: “Would you like help?” or “Let's ask a grown-up.”",
+            "Let the child answer in their own way; never require a hug or touch.",
+        ],
+        "quiz": {
+            "question": "If someone seems upset, what is a kind next step?",
+            "choices": ["Ask if they want help or tell a trusted adult", "Take their toy"],
+            "answer": "Ask if they want help or tell a trusted adult. Respect the other person's space.",
+        },
+    },
+    {
+        "number": "06",
+        "title": "Notice nature",
+        "focus": "Observation and curiosity",
+        "materials": [
+            "A window view or a safe outdoor spot with an adult.",
+            "Weather-appropriate clothing if you go outside.",
+        ],
+        "steps": [
+            "Look for the sun, clouds, or moving leaves from a safe place.",
+            "Use simple words to describe what you notice: “bright,” “windy,” or “cloudy.”",
+            "If you go outdoors, stay close to the child and leave plants and objects where they are.",
+        ],
+        "quiz": {
+            "question": "Who stays close during an outdoor walk?",
+            "choices": ["A trusted grown-up", "No one"],
+            "answer": "A trusted grown-up stays close. Explore only in a safe, supervised place.",
+        },
+    },
+    {
+        "number": "07",
+        "title": "What is a computer?",
+        "focus": "Technology basics, unplugged",
+        "materials": [
+            "Your hands and voices for a pretend instruction game.",
+            "No computer or screen is needed.",
+        ],
+        "steps": [
+            "Explain simply: “A computer is a tool that follows instructions.”",
+            "Give the grown-up two playful steps, such as “wave, then clap,” and let the grown-up follow them.",
+            "Switch roles only if the child wants; keep the game silly and brief.",
+        ],
+        "quiz": {
+            "question": "What helps a computer do a task?",
+            "choices": ["Clear instructions", "A computer guessing what we mean"],
+            "answer": "Clear instructions. A grown-up can help explain and check what a computer does.",
+        },
+    },
+    {
+        "number": "08",
+        "title": "Cyber safety: stop and ask",
+        "focus": "Safe technology habits",
+        "materials": [
+            "A trusted grown-up to role-play with.",
+            "No real device, website, password, or personal information is needed.",
+        ],
+        "steps": [
+            "Pretend a new button appears; the child practices pausing.",
+            "Model saying, “I will ask my grown-up first.”",
+            "Remind the child that grown-ups decide which devices and apps are okay to use.",
+        ],
+        "quiz": {
+            "question": "A new button appears on a device. What should the child do?",
+            "choices": ["Ask a trusted grown-up first", "Tap it alone"],
+            "answer": "Ask a trusted grown-up first. Children this young should use devices only with an adult.",
+        },
+    },
+    {
+        "number": "09",
+        "title": "Meet AI: a computer helper",
+        "focus": "AI ideas, unplugged",
+        "materials": [
+            "Two large, safe picture cards or soft toys that an adult can hold.",
+            "No AI app, internet connection, or screen is needed.",
+        ],
+        "steps": [
+            "Sort two pictures together by a visible feature, such as animal versus vehicle.",
+            "Explain: “Some computer tools look for patterns and make a guess.”",
+            "Say that AI is a tool, not a person, and it can be wrong; a grown-up checks it.",
+        ],
+        "quiz": {
+            "question": "Can an AI computer helper make a mistake?",
+            "choices": ["Yes; a grown-up checks", "No; it is always right"],
+            "answer": "Yes. AI can make mistakes, so a trusted grown-up checks important information.",
+        },
+    },
+    {
+        "number": "10",
+        "title": "Create a safe little story",
+        "focus": "Creativity and review",
+        "materials": [
+            "A favorite board book or two large, age-appropriate toys.",
+            "A trusted grown-up to tell the story with the child.",
+        ],
+        "steps": [
+            "Let the child choose a toy or picture to start an imaginary story.",
+            "Take turns adding one simple action or sound.",
+            "Review the safe-tech habit: ask a grown-up before using a device or computer helper.",
+        ],
+        "quiz": {
+            "question": "Who should help a young child use a computer or AI tool?",
+            "choices": ["A trusted grown-up", "The child alone"],
+            "answer": "A trusted grown-up. Never share a child's name, photo, voice, or other private details with a tool.",
+        },
+    },
+]
+
+
+EARLY_BOOKS = [
+    {
+        "title": "Brown Bear, Brown Bear, What Do You See?",
+        "author": "Bill Martin Jr.; illustrated by Eric Carle",
+        "age": "Publisher age range: 2-5",
+        "focus": "Repeated words, animals, and colors.",
+        "url": "https://us.macmillan.com/books/9780805002010/brownbearbrownbearwhatdoyousee/",
+    },
+    {
+        "title": "Baby Loves Coding!",
+        "author": "Ruth Spiro; illustrated by Irene Chan",
+        "age": "Publisher age range: 0-3",
+        "focus": "Patterns, sequence, and step-by-step problem solving.",
+        "url": "https://www.penguinrandomhouse.com/books/566615/baby-loves-coding-by-ruth-spiro-author-irene-chan-illustrator/",
+    },
+    {
+        "title": "Baby Loves Meteorology",
+        "author": "Ruth Spiro; illustrated by Kat Uno",
+        "age": "Publisher age range: 0-3",
+        "focus": "Weather words and noticing the world.",
+        "url": "https://www.penguinrandomhouse.com/books/762947/baby-loves-meteorology-by-ruth-spiro-author-kat-uno-illustrator/",
+    },
+    {
+        "title": "Artificial Intelligence for Babies",
+        "author": "Chris Ferrie",
+        "age": "A board-book introduction; share with an adult.",
+        "focus": "An early, simple introduction to AI ideas.",
+        "url": "https://www.penguin.co.nz/books/artificial-intelligence-for-babies-9781464221453",
+    },
+]
+
+
 @app.route("/knowledge")
 @login_required
 def knowledge():
@@ -278,7 +504,12 @@ def knowledge():
 @app.route("/early-learning")
 def early_learning():
     user = current_user()
-    return render_template("early_learning.html", user=user)
+    return render_template(
+        "early_learning.html",
+        user=user,
+        lessons=EARLY_LESSONS,
+        books=EARLY_BOOKS,
+    )
 
 
 @app.route("/")

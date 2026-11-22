@@ -238,6 +238,34 @@ input, select {
 .lesson-age-grid article { padding: 15px; border: 1px solid #edf1ea; border-radius: 10px; background: #fbfcf9; }
 .lesson-age-grid h3 { color: var(--green-dark); }
 .lesson-class-note { border-left: 4px solid #86a96b; }
+.lesson-index { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+.lesson-index a { display: flex; min-height: 54px; align-items: center; gap: 8px; padding: 9px; border: 1px solid var(--line); border-radius: 10px; background: white; font-size: .75rem; font-weight: 750; text-decoration: none; }
+.lesson-index a:hover { border-color: #b9cbb2; background: #f7faf4; }
+.lesson-index span, .lesson-number { display: grid; width: 30px; height: 30px; flex: 0 0 30px; place-items: center; border-radius: 50%; background: #edf3e9; color: var(--green-dark); font-size: .67rem; font-weight: 850; }
+.curriculum-lesson { scroll-margin-top: 20px; }
+.curriculum-heading { margin-bottom: 16px; }
+.lesson-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.lesson-focus { color: var(--muted); font-size: .74rem; font-weight: 750; }
+.curriculum-heading h2 { margin: 0; font-size: 1.5rem; }
+.curriculum-columns { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 20px; }
+.curriculum-columns h3 { margin: 0 0 9px; font-size: .95rem; }
+.curriculum-columns .lesson-bullets { gap: 7px; }
+.lesson-quiz { margin-top: 18px; padding: 16px 18px; border: 1px solid #dfe8d8; border-radius: 11px; background: #f7faf4; }
+.lesson-quiz .eyebrow { margin-bottom: 6px; }
+.lesson-quiz h3 { margin: 0 0 8px; font-size: .95rem; }
+.quiz-choices { display: grid; gap: 5px; margin: 0 0 10px; padding-left: 21px; color: #46564f; font-size: .82rem; }
+.lesson-quiz details { color: var(--green-dark); font-size: .8rem; }
+.lesson-quiz summary { width: fit-content; cursor: pointer; font-weight: 800; }
+.lesson-quiz details p { margin: 8px 0 0; color: #46564f; line-height: 1.5; }
+.reading-shelf > p:not(.eyebrow) { color: #536159; font-size: .85rem; line-height: 1.55; }
+.book-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+.book-card { padding: 16px; border: 1px solid #edf1ea; border-radius: 11px; background: #fbfcf9; }
+.book-age { color: var(--green); font-size: .68rem; font-weight: 850; letter-spacing: .04em; text-transform: uppercase; }
+.book-card h3 { margin: 7px 0 5px; font-size: .95rem; }
+.book-card h3 a { color: var(--green-dark); }
+.book-card p { margin: 4px 0 0; color: #536159; font-size: .78rem; line-height: 1.45; }
+.book-card .book-author { color: var(--ink); font-weight: 700; }
+.family-resources a { color: var(--green-dark); font-weight: 750; }
 .session-row { display: grid; grid-template-columns: 12px 1fr 70px 2fr 100px; align-items: center; gap: 10px; min-height: 50px; margin: 0 20px; border-top: 1px solid #edf1ea; font-size: .82rem; }
 .session-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 3px #edf4df; }
 .session-row time { color: var(--muted); text-align: right; }
@@ -297,6 +325,8 @@ input, select {
     .auth-card { margin: 24px auto; }
     .guide-grid { grid-template-columns: 1fr; }
     .lesson-layout, .lesson-age-grid { grid-template-columns: 1fr; }
+    .curriculum-columns, .book-grid { grid-template-columns: 1fr; }
+    .lesson-index { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .growth-feature { align-items: flex-start; flex-direction: column; }
     .resource-strip { grid-template-columns: repeat(2, 1fr); }
 }
@@ -316,4 +346,5 @@ input, select {
     .lesson-hero { padding: 28px 24px; }
     .lesson-card, .lesson-safety { padding: 20px; }
     .lesson-steps li { grid-template-columns: 62px 1fr; gap: 9px; }
+    .lesson-index { grid-template-columns: 1fr; }
 }
