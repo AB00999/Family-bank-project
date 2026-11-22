@@ -13,6 +13,7 @@
             <nav class="side-nav" aria-label="Workspace navigation">
                 <a class="{{ 'active' if request.endpoint == 'dashboard' else '' }}" href="{{ url_for('dashboard') }}"><span>⌂</span>Overview</a>
                 <a class="{{ 'active' if request.endpoint == 'knowledge' else '' }}" href="{{ url_for('knowledge') }}"><span>◎</span>Growth guides</a>
+                <a class="{{ 'active' if request.endpoint == 'early_learning' else '' }}" href="{{ url_for('early_learning') }}"><span>✿</span>Early learners</a>
                 {% if request.endpoint == 'dashboard' %}
                     <a href="#subjects"><span>▦</span>Subjects</a>
                     <a href="#goals"><span>✓</span>Goals</a>
@@ -20,7 +21,9 @@
                     <a href="#history"><span>◷</span>Study history</a>
                 {% endif %}
             </nav>
+            {% if user %}
             <a class="focus-link" href="#focus"><span>+</span>Log study session</a>
+            {% endif %}
             <div class="profile">
                 <div class="avatar">S</div>
                 <div><strong>{{ user.name if user else "My workspace" }}</strong><small>{{ user.email if user else "Local learning profile" }}</small></div>
@@ -38,10 +41,12 @@
                     <p class="topbar-kicker">Personal workspace</p>
                     <strong>{% block page_title %}Overview{% endblock %}</strong>
                 </div>
+                {% if user %}
                 <div class="topbar-actions">
                     <a class="topbar-button" href="#subjects">Add subject</a>
                     <a class="topbar-focus" href="#focus">Start focus</a>
                 </div>
+                {% endif %}
             </header>
             {% with messages = get_flashed_messages() %}
                 {% if messages %}

@@ -275,6 +275,12 @@ def knowledge():
     )
 
 
+@app.route("/early-learning")
+def early_learning():
+    user = current_user()
+    return render_template("early_learning.html", user=user)
+
+
 @app.route("/")
 @login_required
 def dashboard():

@@ -107,6 +107,15 @@ class StudyHubTests(unittest.TestCase):
         self.assertIn(b"criminal record", response.data)
         self.assertIn(b"Build a bill and recovery plan", response.data)
 
+    def test_early_learning_lesson_is_public_and_renders_safety_guidance(self):
+        response = self.client.get("/early-learning")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Colors around us", response.data)
+        self.assertIn(b"Birth", response.data)
+        self.assertIn(b"11 months", response.data)
+        self.assertIn(b"within arm's reach", response.data)
+        self.assertIn(b"not a test or developmental assessment", response.data)
+
 
 if __name__ == "__main__":
     unittest.main()

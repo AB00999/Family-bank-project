@@ -2,6 +2,8 @@
 
 A local Flask learning dashboard for organizing subjects, goals, flashcards, and study sessions.
 
+Study Hub also includes a public Early Learners page with a short, caregiver-led lesson for children from birth to age 3, with age adaptations and safety notes. The lesson does not require an account or collect child information.
+
 ## Run
 
 ```powershell
