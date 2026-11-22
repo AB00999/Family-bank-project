@@ -269,6 +269,7 @@ EARLY_LESSONS = [
         "number": "01",
         "title": "Colors around us",
         "focus": "Words and noticing",
+        "accessibility": "Use high-contrast objects; looking, reaching, or a gesture can be an answer instead of naming a color.",
         "materials": [
             "A sturdy board book or large picture with clear colors.",
             "Two large, intact, age-appropriate soft toys in different colors.",
@@ -288,6 +289,7 @@ EARLY_LESSONS = [
         "number": "02",
         "title": "Count with claps",
         "focus": "Early number sense",
+        "accessibility": "Count with gentle taps or a visual cue; the child can listen instead of clapping.",
         "materials": [
             "A comfortable place to sit or stand together.",
             "Your hands; no loose counters or small objects are needed.",
@@ -307,6 +309,7 @@ EARLY_LESSONS = [
         "number": "03",
         "title": "Shapes all around",
         "focus": "Looking and comparing",
+        "accessibility": "Use large, high-contrast pictures and trace shapes in the air rather than requiring a grasp.",
         "materials": [
             "A sturdy picture book or large picture showing simple shapes.",
             "One large, safe household object with a clear round or square shape.",
@@ -326,6 +329,7 @@ EARLY_LESSONS = [
         "number": "04",
         "title": "Storytime and new words",
         "focus": "Language and connection",
+        "accessibility": "Pause for speech, signs, eye gaze, AAC, or quiet listening; one picture at a time is enough.",
         "materials": [
             "A sturdy board book chosen by the child.",
             "A cozy, safe place to read together.",
@@ -345,6 +349,7 @@ EARLY_LESSONS = [
         "number": "05",
         "title": "Feelings and kindness",
         "focus": "Social and emotional learning",
+        "accessibility": "Use simple words or pictures; never require eye contact, facial imitation, or touch.",
         "materials": [
             "A board book about feelings or familiar faces.",
             "A trusted adult who can model a kind response.",
@@ -364,6 +369,7 @@ EARLY_LESSONS = [
         "number": "06",
         "title": "Notice nature",
         "focus": "Observation and curiosity",
+        "accessibility": "A window view is a comfortable alternative to going outside; adjust light and sound to the child.",
         "materials": [
             "A window view or a safe outdoor spot with an adult.",
             "Weather-appropriate clothing if you go outside.",
@@ -383,6 +389,7 @@ EARLY_LESSONS = [
         "number": "07",
         "title": "What is a computer?",
         "focus": "Technology basics, unplugged",
+        "accessibility": "Give one step at a time; the grown-up can model the movement while the child watches.",
         "materials": [
             "Your hands and voices for a pretend instruction game.",
             "No computer or screen is needed.",
@@ -402,6 +409,7 @@ EARLY_LESSONS = [
         "number": "08",
         "title": "Cyber safety: stop and ask",
         "focus": "Safe technology habits",
+        "accessibility": "Practice “ask first” with speech, a sign, pointing, or the child's usual communication system.",
         "materials": [
             "A trusted grown-up to role-play with.",
             "No real device, website, password, or personal information is needed.",
@@ -421,6 +429,7 @@ EARLY_LESSONS = [
         "number": "09",
         "title": "Meet AI: a computer helper",
         "focus": "AI ideas, unplugged",
+        "accessibility": "Use two familiar, high-contrast pictures; the child can watch while the grown-up describes them.",
         "materials": [
             "Two large, safe picture cards or soft toys that an adult can hold.",
             "No AI app, internet connection, or screen is needed.",
@@ -440,6 +449,7 @@ EARLY_LESSONS = [
         "number": "10",
         "title": "Create a safe little story",
         "focus": "Creativity and review",
+        "accessibility": "Let the child choose by looking, gesturing, using AAC, or speaking; the grown-up can narrate.",
         "materials": [
             "A favorite board book or two large, age-appropriate toys.",
             "A trusted grown-up to tell the story with the child.",

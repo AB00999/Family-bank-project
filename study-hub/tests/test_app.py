@@ -119,6 +119,8 @@ class StudyHubTests(unittest.TestCase):
         self.assertIn(b"Show grown-up answer", response.data)
         self.assertIn(b"Baby Loves Coding!", response.data)
         self.assertIn(b"nothing is saved", response.data)
+        self.assertIn(b'id="print-lessons"', response.data)
+        self.assertEqual(response.data.count(b'class="lesson-accessibility"'), 10)
 
 
 if __name__ == "__main__":

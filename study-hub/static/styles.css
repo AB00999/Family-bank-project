@@ -220,6 +220,9 @@ input, select {
 .lesson-facts { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 22px; }
 .lesson-facts span { display: grid; gap: 2px; min-width: 128px; padding: 11px 14px; border: 1px solid rgba(255,255,255,.2); border-radius: 10px; color: #dce5df; font-size: .72rem; }
 .lesson-facts strong { color: white; font-size: .86rem; }
+.lesson-print-button { min-height: 40px; margin-top: 18px; padding: 0 14px; border: 0; border-radius: 8px; background: var(--lime); color: var(--ink); font-weight: 800; }
+.lesson-print-button:hover { background: #e6f4bd; }
+.lesson-print-hint { margin-top: 7px !important; color: #dce5df !important; font-size: .72rem; }
 .lesson-card, .lesson-safety { margin-bottom: 16px; padding: 23px 25px; border: 1px solid var(--line); border-radius: 15px; background: white; }
 .lesson-card h2, .lesson-safety h2 { margin: 4px 0 12px; font-size: 1.25rem; letter-spacing: -.02em; }
 .lesson-bullets { display: grid; gap: 8px; margin: 0; padding-left: 20px; color: #46564f; font-size: .88rem; line-height: 1.5; }
@@ -250,6 +253,7 @@ input, select {
 .curriculum-columns { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 20px; }
 .curriculum-columns h3 { margin: 0 0 9px; font-size: .95rem; }
 .curriculum-columns .lesson-bullets { gap: 7px; }
+.lesson-accessibility { margin: 14px 0 0; padding: 11px 13px; border-left: 3px solid #779b62; background: #f3f6ef; color: #46564f; font-size: .8rem; line-height: 1.5; }
 .lesson-quiz { margin-top: 18px; padding: 16px 18px; border: 1px solid #dfe8d8; border-radius: 11px; background: #f7faf4; }
 .lesson-quiz .eyebrow { margin-bottom: 6px; }
 .lesson-quiz h3 { margin: 0 0 8px; font-size: .95rem; }
@@ -347,4 +351,19 @@ input, select {
     .lesson-card, .lesson-safety { padding: 20px; }
     .lesson-steps li { grid-template-columns: 62px 1fr; gap: 9px; }
     .lesson-index { grid-template-columns: 1fr; }
+}
+@media print {
+    @page { margin: 14mm; }
+    body { background: white; color: #111; font-size: 10pt; }
+    .app-shell { display: block; min-height: auto; }
+    .sidebar, .topbar, .flash-wrap, .lesson-index, .lesson-print-button, .lesson-print-hint { display: none !important; }
+    .main-column, main { width: 100%; }
+    .dashboard { width: 100%; margin: 0; }
+    .lesson-hero { padding: 0 0 12px; border: 0; border-bottom: 1px solid #999; border-radius: 0; background: white; color: #111; }
+    .lesson-hero .eyebrow, .lesson-hero > p:not(.eyebrow) { color: #222; }
+    .lesson-hero h1, .lesson-facts strong { color: #111; }
+    .lesson-facts span { border-color: #999; color: #222; }
+    .lesson-card, .lesson-safety, .book-card, .lesson-quiz { border-color: #999; background: white; color: #111; box-shadow: none; }
+    .curriculum-lesson, .lesson-age-grid article, .book-card { break-inside: avoid; page-break-inside: avoid; }
+    .lesson-quiz details > p, .lesson-quiz details:not([open]) > p { display: block !important; }
 }

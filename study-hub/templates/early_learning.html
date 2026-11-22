@@ -12,6 +12,8 @@
             <span><strong>3-10</strong> minutes each</span>
             <span><strong>Screen-free</strong> activities</span>
         </div>
+        <button class="lesson-print-button" id="print-lessons" type="button">Print lesson cards</button>
+        <p class="lesson-print-hint">Use your browser's print dialog; answer keys are included on paper.</p>
     </header>
 
     <aside class="lesson-safety" aria-labelledby="course-safety-title">
@@ -60,12 +62,13 @@
                     </ol>
                 </section>
             </div>
+            <p class="lesson-accessibility"><strong>Access tip:</strong> {{ lesson.accessibility }}</p>
             <section class="lesson-quiz" aria-label="Caregiver-led quiz">
                 <p class="eyebrow">Talk-it-through quiz</p>
                 <h3>{{ lesson.quiz.question }}</h3>
                 <ol class="quiz-choices">
                     {% for choice in lesson.quiz.choices %}<li>{{ choice }}</li>{% endfor %}
-                </ul>
+                </ol>
                 <details>
                     <summary>Show grown-up answer</summary>
                     <p>{{ lesson.quiz.answer }}</p>

@@ -61,3 +61,10 @@ if (goalFormButton && goalForm) {
         goalForm.classList.toggle("is-open");
     });
 }
+
+const printLessonsButton = document.querySelector("#print-lessons");
+if (printLessonsButton) {
+    printLessonsButton.addEventListener("click", () => {
+        window.print();
+    });
+}
