@@ -19,7 +19,7 @@
     <aside class="lesson-safety" aria-labelledby="course-safety-title">
         <p class="eyebrow">For the grown-up</p>
         <h2 id="course-safety-title">Play, pause, and keep children safe</h2>
-        <p>Read quiz prompts aloud and let the child answer with a look, gesture, movement, sound, or words. Answers are just for conversation: there is no score and nothing is saved. Stay within arm's reach, follow toy age labels, and keep small or detachable objects away. The computer, cyber safety, and AI lessons use pretend play only; a young child does not need a device or an online account.</p>
+        <p>Read quiz prompts aloud. Let the child answer with a look, gesture, movement, sound, or words, then tap their choice together. The gentle response is for conversation: there is no score and nothing is saved. Stay within arm's reach, follow toy age labels, and keep small or detachable objects away. The computer, cyber safety, and AI lessons use pretend play only; a young child does not need a device or an online account.</p>
     </aside>
 
     <nav class="lesson-index" aria-label="Jump to a lesson">
@@ -66,9 +66,12 @@
             <section class="lesson-quiz" aria-label="Caregiver-led quiz">
                 <p class="eyebrow">Talk-it-through quiz</p>
                 <h3>{{ lesson.quiz.question }}</h3>
-                <ol class="quiz-choices">
-                    {% for choice in lesson.quiz.choices %}<li>{{ choice }}</li>{% endfor %}
-                </ol>
+                <div class="quiz-choices">
+                    {% for choice in lesson.quiz.choices %}
+                    <button class="quiz-choice" type="button" aria-pressed="false" data-correct="{{ 'true' if choice == lesson.quiz.correct_choice else 'false' }}">{{ choice }}</button>
+                    {% endfor %}
+                </div>
+                <p class="quiz-feedback" role="status" aria-live="polite"></p>
                 <details>
                     <summary>Show grown-up answer</summary>
                     <p>{{ lesson.quiz.answer }}</p>

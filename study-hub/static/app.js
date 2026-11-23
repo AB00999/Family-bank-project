@@ -68,3 +68,23 @@ if (printLessonsButton) {
         window.print();
     });
 }
+
+document.querySelectorAll(".lesson-quiz").forEach((quiz) => {
+    const feedback = quiz.querySelector(".quiz-feedback");
+    const answer = quiz.querySelector("details > p");
+    const choices = quiz.querySelectorAll(".quiz-choice");
+
+    choices.forEach((choice) => {
+        choice.addEventListener("click", () => {
+            choices.forEach((item) => {
+                item.setAttribute("aria-pressed", String(item === choice));
+                item.classList.toggle("is-selected", item === choice);
+            });
+
+            const response = choice.dataset.correct === "true"
+                ? "Yes! "
+                : "Good thinking! Let's explore: ";
+            feedback.textContent = response + answer.textContent;
+        });
+    });
+});

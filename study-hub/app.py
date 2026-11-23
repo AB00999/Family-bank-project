@@ -282,6 +282,7 @@ EARLY_LESSONS = [
         "quiz": {
             "question": "Which object is blue?",
             "choices": ["The blue soft toy", "The red book"],
+            "correct_choice": "The blue soft toy",
             "answer": "The blue soft toy. If the child is unsure, point to it and say the color together.",
         },
     },
@@ -302,6 +303,7 @@ EARLY_LESSONS = [
         "quiz": {
             "question": "How many claps did we try first?",
             "choices": ["One", "Ten"],
+            "correct_choice": "One",
             "answer": "One. Count again together; a look, sound, or movement is a response.",
         },
     },
@@ -322,6 +324,7 @@ EARLY_LESSONS = [
         "quiz": {
             "question": "Which shape has a round edge?",
             "choices": ["A circle", "A square"],
+            "correct_choice": "A circle",
             "answer": "A circle. Show it in the picture and trace it together.",
         },
     },
@@ -342,6 +345,7 @@ EARLY_LESSONS = [
         "quiz": {
             "question": "What can we do when we see a picture?",
             "choices": ["Point to it and talk about it", "Rush to finish the book"],
+            "correct_choice": "Point to it and talk about it",
             "answer": "Point to it and talk about it. Follow the child's interest and enjoy the moment.",
         },
     },
@@ -362,6 +366,7 @@ EARLY_LESSONS = [
         "quiz": {
             "question": "If someone seems upset, what is a kind next step?",
             "choices": ["Ask if they want help or tell a trusted adult", "Take their toy"],
+            "correct_choice": "Ask if they want help or tell a trusted adult",
             "answer": "Ask if they want help or tell a trusted adult. Respect the other person's space.",
         },
     },
@@ -382,6 +387,7 @@ EARLY_LESSONS = [
         "quiz": {
             "question": "Who stays close during an outdoor walk?",
             "choices": ["A trusted grown-up", "No one"],
+            "correct_choice": "A trusted grown-up",
             "answer": "A trusted grown-up stays close. Explore only in a safe, supervised place.",
         },
     },
@@ -402,6 +408,7 @@ EARLY_LESSONS = [
         "quiz": {
             "question": "What helps a computer do a task?",
             "choices": ["Clear instructions", "A computer guessing what we mean"],
+            "correct_choice": "Clear instructions",
             "answer": "Clear instructions. A grown-up can help explain and check what a computer does.",
         },
     },
@@ -422,6 +429,7 @@ EARLY_LESSONS = [
         "quiz": {
             "question": "A new button appears on a device. What should the child do?",
             "choices": ["Ask a trusted grown-up first", "Tap it alone"],
+            "correct_choice": "Ask a trusted grown-up first",
             "answer": "Ask a trusted grown-up first. Children this young should use devices only with an adult.",
         },
     },
@@ -442,6 +450,7 @@ EARLY_LESSONS = [
         "quiz": {
             "question": "Can an AI computer helper make a mistake?",
             "choices": ["Yes; a grown-up checks", "No; it is always right"],
+            "correct_choice": "Yes; a grown-up checks",
             "answer": "Yes. AI can make mistakes, so a trusted grown-up checks important information.",
         },
     },
@@ -462,6 +471,7 @@ EARLY_LESSONS = [
         "quiz": {
             "question": "Who should help a young child use a computer or AI tool?",
             "choices": ["A trusted grown-up", "The child alone"],
+            "correct_choice": "A trusted grown-up",
             "answer": "A trusted grown-up. Never share a child's name, photo, voice, or other private details with a tool.",
         },
     },
